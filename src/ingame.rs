@@ -50,6 +50,8 @@ fn game_diffuculty_easy(
     mut commands: Commands,
     asset_server: Res<AssetServer>
 ) {
+    info!("normal ball created");
+    
     //jump-ball spawn
     commands.spawn(
         SpriteBundle{
