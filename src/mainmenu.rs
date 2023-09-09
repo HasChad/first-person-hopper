@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::AppState;
+use crate::GameDifficultyState;
 
 pub struct MainMenuPlugin;
 
@@ -16,7 +17,7 @@ impl Plugin for MainMenuPlugin {
 
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
-const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
+const PRESSED_BUTTON: Color = Color::WHITE;
 
 fn setup(
     mut commands: Commands,
@@ -77,7 +78,10 @@ fn button_system(
         match *interaction {
             Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
-                border_color.0 = Color::RED;
+                border_color.0 = Color::BLACK;
+
+                commands.insert_resource(NextState(Some(GameDifficultyState::Easy)));
+                info!("diffuculty changed");
                 commands.insert_resource(NextState(Some(AppState::InGame)));
             }
             Interaction::Hovered => {

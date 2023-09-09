@@ -5,14 +5,7 @@ use bevy_cursor::prelude::*;
 use crate::SCREEN_HEIGHT;
 use crate::SCREEN_WIDTH;
 use crate::AppState;
-
-#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-pub enum GameDifficultyState {
-    #[default]
-    Easy,
-    Medium,
-    Hard
-}
+use crate::GameDifficultyState;
 
 #[derive(Component)]
 struct InGameEntity;
@@ -34,9 +27,11 @@ impl Plugin for InGamePlugin {
             .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1.0))
             // ! .add_plugins(RapierDebugRenderPlugin::default())
             .add_plugins(CursorInfoPlugin)
-            .add_systems(OnEnter(AppState::InGame), setup)
-            
-            .add_systems(OnEnter(AppState::InGame), game_diffuculty_easy)
+            .add_systems(OnEnter(AppState::InGame), (
+                setup,
+                game_diffuculty_easy.run_if(in_state(GameDifficultyState::Easy)),
+                game_diffuculty_hard.run_if(in_state(GameDifficultyState::Hard)),
+            ))
 
             .add_systems(Update, (
                 cursor_position,
@@ -46,13 +41,20 @@ impl Plugin for InGamePlugin {
     }
 }
 
+fn game_diffuculty_hard(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
+) {
+
+}
+
 fn game_diffuculty_easy(
     mut commands: Commands,
     asset_server: Res<AssetServer>
 ) {
     info!("normal ball created");
-    
-    //jump-ball spawn
+
+    //normal jump-ball spawn
     commands.spawn(
         SpriteBundle{
             texture: asset_server.load("sprites\\ball.png"),

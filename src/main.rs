@@ -26,6 +26,7 @@ fn main() {
         )
         .add_systems(Startup, setup)
         .add_state::<AppState>()
+        .add_state::<GameDifficultyState>()
         .add_plugins(InGamePlugin)
         .add_plugins(MainMenuPlugin)
         .run();
@@ -37,6 +38,14 @@ pub enum AppState {
     MainMenu,
     InGame,
     GameOver
+}
+
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+pub enum GameDifficultyState {
+    #[default]
+    Easy,
+    Medium,
+    Hard
 }
 
 fn setup (
