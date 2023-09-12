@@ -153,6 +153,11 @@ fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServer>) 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Query<&mut Window>) {
     info!("Game Started");
 
+    commands.spawn(AudioBundle {
+        source: asset_server.load("sounds\\start.ogg"),
+        ..default()
+    });
+
     //timer creation
     commands
         .spawn(EndGameTimer {

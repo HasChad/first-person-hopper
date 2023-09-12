@@ -37,12 +37,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .insert(GameOverEntity);
 
+    //create full screen node bundle
     commands
         .spawn(NodeBundle {
             style: Style {
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),
-                flex_direction: FlexDirection::Row,
+                flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
                 column_gap: Val::Px(100.0),
@@ -51,69 +52,126 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         })
         .insert(GameOverEntity)
-        //spawn easy button
+        //create upper "game over" title node bundle
         .with_children(|parent| {
             parent
-                .spawn(ButtonBundle {
+                .spawn(NodeBundle {
                     style: Style {
-                        width: Val::Px(200.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        // horizontally center child text
-                        justify_content: JustifyContent::Center,
-                        // vertically center child text
+                        height: Val::Percent(50.0),
+                        width: Val::Percent(100.0),
                         align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
                         ..default()
                     },
-                    border_color: BorderColor(Color::BLACK),
-                    background_color: NORMAL_BUTTON.into(),
                     ..default()
                 })
-                .insert(HomeButton)
+                //create yellow background
                 .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "MAIN MENU",
-                        TextStyle {
-                            font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                    parent
+                        .spawn(NodeBundle {
+                            style: Style {
+                                width: Val::Px(1000.0),
+                                height: Val::Px(100.0),
+                                align_items: AlignItems::Center,
+                                justify_content: JustifyContent::Center,
+                                ..default()
+                            },
+                            background_color: Color::YELLOW.into(),
                             ..default()
-                        },
-                    ));
+                        })
+                        //"game over" text
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                "GAME OVER",
+                                TextStyle {
+                                    font_size: 70.0,
+                                    color: Color::BLACK,
+                                    ..default()
+                                },
+                            ));
+                        });
                 });
-
-            //spawn medium button
+        })
+        //create "main menu" and "restart" buttons
+        .with_children(|parent| {
             parent
-                .spawn(ButtonBundle {
+                .spawn(NodeBundle {
                     style: Style {
-                        width: Val::Px(200.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        // horizontally center child text
-                        justify_content: JustifyContent::Center,
-                        // vertically center child text
+                        height: Val::Percent(50.0),
+                        width: Val::Percent(100.0),
+                        flex_direction: FlexDirection::Row,
                         align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
+                        column_gap: Val::Px(100.0),
                         ..default()
                     },
-                    border_color: BorderColor(Color::BLACK),
-                    background_color: NORMAL_BUTTON.into(),
                     ..default()
                 })
-                .insert(RestartButton)
+                //spawn "main menu" button
                 .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "RESTART",
-                        TextStyle {
-                            font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                    parent
+                        .spawn(ButtonBundle {
+                            style: Style {
+                                width: Val::Px(200.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                // horizontally center child text
+                                justify_content: JustifyContent::Center,
+                                // vertically center child text
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            border_color: BorderColor(Color::BLACK),
+                            background_color: NORMAL_BUTTON.into(),
                             ..default()
-                        },
-                    ));
+                        })
+                        .insert(HomeButton)
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                "MAIN MENU",
+                                TextStyle {
+                                    font_size: 40.0,
+                                    color: Color::rgb(0.9, 0.9, 0.9),
+                                    ..default()
+                                },
+                            ));
+                        });
+
+                    //spawn restart button
+                    parent
+                        .spawn(ButtonBundle {
+                            style: Style {
+                                width: Val::Px(200.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                // horizontally center child text
+                                justify_content: JustifyContent::Center,
+                                // vertically center child text
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            border_color: BorderColor(Color::BLACK),
+                            background_color: NORMAL_BUTTON.into(),
+                            ..default()
+                        })
+                        .insert(RestartButton)
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                "RESTART",
+                                TextStyle {
+                                    font_size: 40.0,
+                                    color: Color::rgb(0.9, 0.9, 0.9),
+                                    ..default()
+                                },
+                            ));
+                        });
                 });
         });
 }
 
 fn home_button_system(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<HomeButton>),
@@ -127,6 +185,10 @@ fn home_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    ..default()
+                });
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
@@ -138,6 +200,7 @@ fn home_button_system(
 
 fn restart_button_system(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<RestartButton>),
@@ -151,6 +214,10 @@ fn restart_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    ..default()
+                });
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();

@@ -40,14 +40,16 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         })
         .insert(MainMenuEntity);
-
+    //spawn full screen node bundle
     commands
         .spawn(NodeBundle {
             style: Style {
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),
                 flex_direction: FlexDirection::Row,
+                // vertically center child text
                 align_items: AlignItems::Center,
+                // horizontally center child text
                 justify_content: JustifyContent::Center,
                 column_gap: Val::Px(100.0),
                 ..default()
@@ -63,9 +65,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         width: Val::Px(150.0),
                         height: Val::Px(65.0),
                         border: UiRect::all(Val::Px(5.0)),
-                        // horizontally center child text
                         justify_content: JustifyContent::Center,
-                        // vertically center child text
                         align_items: AlignItems::Center,
                         ..default()
                     },
@@ -79,7 +79,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         "EASY",
                         TextStyle {
                             font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                            color: Color::rgb(0.19, 0.76, 0.41),
                             ..default()
                         },
                     ));
@@ -108,7 +108,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         "MEDIUM",
                         TextStyle {
                             font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                            color: Color::rgb(0.35, 0.67, 0.89),
                             ..default()
                         },
                     ));
@@ -137,7 +137,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         "HARD",
                         TextStyle {
                             font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                            color: Color::rgb(0.88, 0.21, 0.20),
                             ..default()
                         },
                     ));
@@ -147,6 +147,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn easy_button_system(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<EasyButton>),
@@ -156,11 +157,15 @@ fn easy_button_system(
         match *interaction {
             Interaction::Pressed => {
                 commands.insert_resource(NextState(Some(AppState::InGame)));
-                commands.insert_resource(NextState(Some(GameDifficultyState::Easy)))
+                commands.insert_resource(NextState(Some(GameDifficultyState::Easy)));
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    ..default()
+                });
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
@@ -172,6 +177,7 @@ fn easy_button_system(
 
 fn medium_button_system(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<MediumButton>),
@@ -181,11 +187,15 @@ fn medium_button_system(
         match *interaction {
             Interaction::Pressed => {
                 commands.insert_resource(NextState(Some(AppState::InGame)));
-                commands.insert_resource(NextState(Some(GameDifficultyState::Medium)))
+                commands.insert_resource(NextState(Some(GameDifficultyState::Medium)));
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    ..default()
+                });
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
@@ -197,6 +207,7 @@ fn medium_button_system(
 
 fn hard_button_system(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<HardButton>),
@@ -211,6 +222,10 @@ fn hard_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    ..default()
+                });
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
