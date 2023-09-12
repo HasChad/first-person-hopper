@@ -19,6 +19,11 @@ struct Ball;
 #[derive(Component)]
 struct M4;
 
+#[derive(Component)]
+struct EndGameTimer {
+    lifetime: Timer,
+}
+
 pub struct InGamePlugin;
 
 impl Plugin for InGamePlugin {
@@ -30,8 +35,9 @@ impl Plugin for InGamePlugin {
                 OnEnter(AppState::InGame),
                 (
                     setup,
-                    game_diffuculty_easy.run_if(in_state(GameDifficultyState::Easy)),
-                    game_diffuculty_hard.run_if(in_state(GameDifficultyState::Hard)),
+                    game_difficulty_medium.run_if(in_state(GameDifficultyState::Medium)),
+                    game_difficulty_hard.run_if(in_state(GameDifficultyState::Hard)),
+                    game_difficulty_easy.run_if(in_state(GameDifficultyState::Easy)),
                 ),
             )
             .add_systems(
@@ -42,13 +48,47 @@ impl Plugin for InGamePlugin {
     }
 }
 
-fn game_diffuculty_hard(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Hard ball created");
 
     //normal jump-ball spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\ball.png"),
+            texture: asset_server.load("sprites\\hard_ball.png"),
+            ..default()
+        })
+        .insert(Collider::ball(25.0))
+        .insert(Sleeping {
+            sleeping: true,
+            ..default()
+        })
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -1.0)))
+        .insert(RigidBody::Dynamic)
+        .insert(GravityScale(24.0))
+        .insert(ColliderMassProperties::Density(0.4))
+        .insert(Restitution {
+            coefficient: 1.0,
+            combine_rule: CoefficientCombineRule::Average,
+        })
+        .insert(Velocity {
+            linvel: Vec2::new(0.0, 0.0),
+            angvel: 0.0,
+        })
+        .insert(ExternalImpulse {
+            impulse: Vec2::new(0.0, 0.0),
+            torque_impulse: 0.0,
+        })
+        .insert(Ball)
+        .insert(InGameEntity);
+}
+
+fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetServer>) {
+    info!("Medium ball created");
+
+    //normal jump-ball spawn
+    commands
+        .spawn(SpriteBundle {
+            texture: asset_server.load("sprites\\medium_ball.png"),
             ..default()
         })
         .insert(Collider::ball(50.0))
@@ -58,7 +98,7 @@ fn game_diffuculty_hard(mut commands: Commands, asset_server: Res<AssetServer>) 
         })
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -1.0)))
         .insert(RigidBody::Dynamic)
-        .insert(GravityScale(17.0))
+        .insert(GravityScale(30.0))
         .insert(ColliderMassProperties::Density(0.1))
         .insert(Restitution {
             coefficient: 1.0,
@@ -76,13 +116,13 @@ fn game_diffuculty_hard(mut commands: Commands, asset_server: Res<AssetServer>) 
         .insert(InGameEntity);
 }
 
-fn game_diffuculty_easy(mut commands: Commands, asset_server: Res<AssetServer>) {
-    info!("Normal ball created");
+fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServer>) {
+    info!("Easy ball created");
 
     //normal jump-ball spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\ball.png"),
+            texture: asset_server.load("sprites\\easy_ball.png"),
             ..default()
         })
         .insert(Collider::ball(50.0))
@@ -112,6 +152,13 @@ fn game_diffuculty_easy(mut commands: Commands, asset_server: Res<AssetServer>) 
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Query<&mut Window>) {
     info!("Game Started");
+
+    //timer creation
+    commands
+        .spawn(EndGameTimer {
+            lifetime: Timer::from_seconds(0.5, TimerMode::Once),
+        })
+        .insert(InGameEntity);
 
     //lock and hide crosshair
     let mut window = windows.single_mut();
@@ -237,25 +284,35 @@ fn ball_movement(
 }
 
 fn entity_despawner(
+    mut timer: Query<&mut EndGameTimer>,
     mut entities: Query<Entity, With<InGameEntity>>,
     mut commands: Commands,
     ball: Query<&Transform, With<Ball>>,
+    time: Res<Time>,
     mut windows: Query<&mut Window>,
 ) {
     if ball.single().translation.y < -420.0 {
-        info!("Despawner Activated");
+        info!("timer created");
 
-        //enable cursor
-        let mut window = windows.single_mut();
-        window.cursor.visible = true;
-        window.cursor.grab_mode = CursorGrabMode::None;
+        let mut end_game_timer = timer.single_mut();
 
-        //change state
-        commands.insert_resource(NextState(Some(AppState::MainMenu)));
+        end_game_timer.lifetime.tick(time.delta());
 
-        //despawn everyting in InGame
-        for entities_despawner in &mut entities {
-            commands.entity(entities_despawner).despawn();
+        if end_game_timer.lifetime.finished() {
+            info!("Despawner Activated");
+
+            //enable cursor
+            let mut window = windows.single_mut();
+            window.cursor.visible = true;
+            window.cursor.grab_mode = CursorGrabMode::None;
+
+            //change state
+            commands.insert_resource(NextState(Some(AppState::GameOver)));
+
+            //despawn everyting in InGame
+            for entities_despawner in &mut entities {
+                commands.entity(entities_despawner).despawn();
+            }
         }
     }
 }
