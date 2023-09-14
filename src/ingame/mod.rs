@@ -10,9 +10,7 @@ use crate::AppState;
 use crate::GameDifficultyState;
 use gameplay::*;
 use spawn::*;
-
-use self::ui::ui_setup;
-use self::ui::ui_update;
+use ui::*;
 
 pub struct InGamePlugin;
 

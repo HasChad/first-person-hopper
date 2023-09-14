@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 
 use crate::ingame::InGameEntity;
+use crate::ingame::SCORE;
+
+#[derive(Component)]
+pub struct ScoreText;
 
 pub fn ui_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
@@ -16,17 +20,29 @@ pub fn ui_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         })
         .insert(InGameEntity)
+        .insert(ScoreText)
         //score text
-        .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "0",
-                TextStyle {
-                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
-                    font_size: 80.0,
-                    color: Color::WHITE,
+        .with_children(|commands| {
+            commands.spawn((
+                TextBundle {
+                    text: Text::from_section(
+                        "Money!",
+                        TextStyle {
+                            font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                            font_size: 80.0,
+                            color: Color::WHITE,
+                        },
+                    ),
+                    ..default()
                 },
+                ScoreText,
             ));
         });
 }
 
-pub fn ui_update() {}
+pub fn ui_update(mut texts: Query<&mut Text, With<ScoreText>>) {
+    for mut text in &mut texts {
+        info!("nice work");
+        text.sections[0].value = unsafe { SCORE.to_string() };
+    }
+}

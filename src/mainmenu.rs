@@ -1,3 +1,5 @@
+#![allow(clippy::complexity)]
+
 use bevy::prelude::*;
 
 use crate::AppState;

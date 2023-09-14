@@ -4,6 +4,8 @@ use bevy_rapier2d::prelude::*;
 use crate::SCREEN_HEIGHT;
 use crate::SCREEN_WIDTH;
 
+pub static mut SCORE: i32 = 0;
+
 #[derive(Component)]
 pub struct InGameEntity;
 
@@ -11,7 +13,11 @@ pub struct InGameEntity;
 pub struct CursorCrosshair;
 
 #[derive(Component)]
-pub struct Ball;
+pub enum Ball {
+    Easy,
+    Medium,
+    Hard,
+}
 
 #[derive(Component)]
 pub struct M4 {
@@ -54,7 +60,7 @@ pub fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServe
             impulse: Vec2::new(0.0, 0.0),
             torque_impulse: 0.0,
         })
-        .insert(Ball)
+        .insert(Ball::Hard)
         .insert(InGameEntity);
 }
 
@@ -88,7 +94,7 @@ pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetSer
             impulse: Vec2::new(0.0, 0.0),
             torque_impulse: 0.0,
         })
-        .insert(Ball)
+        .insert(Ball::Medium)
         .insert(InGameEntity);
 }
 
@@ -122,7 +128,7 @@ pub fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServe
             impulse: Vec2::new(0.0, 0.0),
             torque_impulse: 0.0,
         })
-        .insert(Ball)
+        .insert(Ball::Easy)
         .insert(InGameEntity);
 }
 
@@ -132,6 +138,8 @@ pub fn setup(
     mut windows: Query<&mut Window>,
 ) {
     info!("Game Started");
+
+    unsafe { SCORE = 0 };
 
     commands.spawn(AudioBundle {
         source: asset_server.load("sounds\\start.ogg"),

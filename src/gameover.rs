@@ -1,3 +1,5 @@
+#![allow(clippy::complexity)]
+
 use bevy::prelude::*;
 
 use crate::AppState;
@@ -89,6 +91,19 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                     color: Color::BLACK,
                                 },
                             ));
+                        })
+                        .with_children(|commands| {
+                            commands.spawn(TextBundle {
+                                text: Text::from_section(
+                                    "Money!",
+                                    TextStyle {
+                                        font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                                        font_size: 80.0,
+                                        color: Color::WHITE,
+                                    },
+                                ),
+                                ..default()
+                            });
                         });
                 });
         })

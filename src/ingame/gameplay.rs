@@ -9,6 +9,12 @@ use crate::ingame::CursorCrosshair;
 use crate::ingame::EndGameTimer;
 use crate::ingame::InGameEntity;
 use crate::ingame::M4;
+use crate::ingame::SCORE;
+
+pub(crate) static mut HIGH_SCORE: i32 = 0;
+pub static mut EASY_HSCORE: i32 = 0;
+pub static mut MEDIUM_HSCORE: i32 = 0;
+pub static mut HARD_HSCORE: i32 = 0;
 
 pub fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
     let mut m4_props = m4.single_mut();
@@ -72,6 +78,8 @@ pub fn ball_movement(
                     source: asset_server.load("sounds\\click.ogg"),
                     ..default()
                 });
+                unsafe { SCORE += 1 };
+                info!("{}", unsafe { SCORE.to_string() });
                 ball_velocity.linvel.y = 0.0;
                 ball_velocity.linvel.x = 0.0;
                 ball_velocity.angvel = 0.0;
@@ -87,12 +95,32 @@ pub fn entity_despawner(
     mut timer: Query<&mut EndGameTimer>,
     mut entities: Query<Entity, With<InGameEntity>>,
     mut commands: Commands,
-    ball: Query<&Transform, With<Ball>>,
+    ball: Query<(&Transform, &Ball)>,
     time: Res<Time>,
     mut windows: Query<&mut Window>,
 ) {
-    if ball.single().translation.y < -420.0 {
+    if ball.single().0.translation.y < -420.0 {
         info!("timer created");
+
+        let ball_x = ball.single().1;
+
+        match ball_x {
+            Ball::Easy => {
+                if unsafe { SCORE > EASY_HSCORE } {
+                    unsafe { HIGH_SCORE = EASY_HSCORE }
+                }
+            }
+            Ball::Medium => {
+                if unsafe { SCORE > EASY_HSCORE } {
+                    unsafe { HIGH_SCORE = EASY_HSCORE }
+                }
+            }
+            Ball::Hard => {
+                if unsafe { SCORE > EASY_HSCORE } {
+                    unsafe { HIGH_SCORE = EASY_HSCORE }
+                }
+            }
+        }
 
         let mut end_game_timer = timer.single_mut();
 
