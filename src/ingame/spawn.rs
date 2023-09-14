@@ -1,62 +1,30 @@
 use bevy::{prelude::*, window::CursorGrabMode};
-use bevy_cursor::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::AppState;
-use crate::GameDifficultyState;
 use crate::SCREEN_HEIGHT;
 use crate::SCREEN_WIDTH;
 
 #[derive(Component)]
-struct InGameEntity;
+pub struct InGameEntity;
 
 #[derive(Component)]
-struct CursorCrosshair;
+pub struct CursorCrosshair;
 
 #[derive(Component)]
-struct Ball;
+pub struct Ball;
 
 #[derive(Component)]
-struct M4 {
-    lifetime: Timer,
-    okay_to_shoot: bool,
+pub struct M4 {
+    pub lifetime: Timer,
+    pub okay_to_shoot: bool,
 }
 
 #[derive(Component)]
-struct EndGameTimer {
-    lifetime: Timer,
+pub struct EndGameTimer {
+    pub lifetime: Timer,
 }
 
-pub struct InGamePlugin;
-
-impl Plugin for InGamePlugin {
-    fn build(&self, app: &mut App) {
-        app.add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1.0))
-            // ! .add_plugins(RapierDebugRenderPlugin::default())
-            .add_plugins(CursorInfoPlugin)
-            .add_systems(
-                OnEnter(AppState::InGame),
-                (
-                    setup,
-                    game_difficulty_medium.run_if(in_state(GameDifficultyState::Medium)),
-                    game_difficulty_hard.run_if(in_state(GameDifficultyState::Hard)),
-                    game_difficulty_easy.run_if(in_state(GameDifficultyState::Easy)),
-                ),
-            )
-            .add_systems(
-                Update,
-                (
-                    cursor_position,
-                    ball_movement,
-                    entity_despawner,
-                    m4_shooting,
-                )
-                    .run_if(in_state(AppState::InGame)),
-            );
-    }
-}
-
-fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Hard ball created");
 
     //normal jump-ball spawn
@@ -90,7 +58,7 @@ fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServer>) 
         .insert(InGameEntity);
 }
 
-fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Medium ball created");
 
     //normal jump-ball spawn
@@ -124,7 +92,7 @@ fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetServer>
         .insert(InGameEntity);
 }
 
-fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServer>) {
     info!("Easy ball created");
 
     //normal jump-ball spawn
@@ -158,7 +126,11 @@ fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServer>) 
         .insert(InGameEntity);
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Query<&mut Window>) {
+pub fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut windows: Query<&mut Window>,
+) {
     info!("Game Started");
 
     commands.spawn(AudioBundle {
@@ -244,111 +216,4 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Qu
             combine_rule: CoefficientCombineRule::Min,
         })
         .insert(InGameEntity);
-}
-
-fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
-    let mut m4_props = m4.single_mut();
-
-    if !m4_props.okay_to_shoot {
-        m4_props.lifetime.tick(time.delta());
-
-        if m4_props.lifetime.finished() {
-            m4_props.okay_to_shoot = true;
-            m4_props.lifetime = Timer::from_seconds(0.2, TimerMode::Once);
-        }
-    }
-}
-
-fn cursor_position(
-    q_windows: Res<CursorInfo>,
-    mut crosshair: Query<&mut Transform, With<CursorCrosshair>>,
-    mut m4: Query<&mut Transform, (With<M4>, Without<CursorCrosshair>)>,
-) {
-    let Some(position) = q_windows.position() else {
-        return; //info!("out of window");
-    };
-
-    let mut m4_position = m4.single_mut();
-
-    for mut crosshair_pos in &mut crosshair {
-        //crosshair position
-        crosshair_pos.translation.x = position.x;
-        crosshair_pos.translation.y = position.y;
-        //m4 position relative to cursor position
-        m4_position.translation.x = position.x + 350.0;
-        m4_position.translation.y = position.y - 400.0;
-    }
-}
-
-fn ball_movement(
-    mut commands: Commands,
-    mut ball: Query<(Entity, &mut ExternalImpulse, &mut Velocity), With<Ball>>,
-    mut m4: Query<&mut M4>,
-    crosshair: Query<Entity, With<CursorCrosshair>>,
-    input: Res<Input<MouseButton>>,
-    rapier_context: Res<RapierContext>,
-    asset_server: Res<AssetServer>,
-) {
-    let entity_ball = ball.single().0;
-    let entity_cross = crosshair.single();
-    let mut m4_props = m4.single_mut();
-
-    if input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
-        //sound play
-        m4_props.okay_to_shoot = false;
-        commands.spawn(AudioBundle {
-            source: asset_server.load("sounds\\M16.ogg"),
-            ..default()
-        });
-
-        //jump ball if collide eachother
-        for (_, mut ball_impulse, mut ball_velocity) in &mut ball {
-            if rapier_context.intersection_pair(entity_ball, entity_cross) == Some(true) {
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds\\click.ogg"),
-                    ..default()
-                });
-                ball_velocity.linvel.y = 0.0;
-                ball_velocity.linvel.x = 0.0;
-                ball_velocity.angvel = 0.0;
-                ball_impulse.impulse.y = alea::f32_in_range(500000.0, 900000.0);
-                ball_impulse.impulse.x = alea::f32_in_range(-500000.0, 500000.0);
-                ball_impulse.torque_impulse = alea::f32_in_range(-10000000.0, 10000000.0);
-            }
-        }
-    }
-}
-
-fn entity_despawner(
-    mut timer: Query<&mut EndGameTimer>,
-    mut entities: Query<Entity, With<InGameEntity>>,
-    mut commands: Commands,
-    ball: Query<&Transform, With<Ball>>,
-    time: Res<Time>,
-    mut windows: Query<&mut Window>,
-) {
-    if ball.single().translation.y < -420.0 {
-        info!("timer created");
-
-        let mut end_game_timer = timer.single_mut();
-
-        end_game_timer.lifetime.tick(time.delta());
-
-        if end_game_timer.lifetime.finished() {
-            info!("Despawner Activated");
-
-            //enable cursor
-            let mut window = windows.single_mut();
-            window.cursor.visible = true;
-            window.cursor.grab_mode = CursorGrabMode::None;
-
-            //change state
-            commands.insert_resource(NextState(Some(AppState::GameOver)));
-
-            //despawn everyting in InGame
-            for entities_despawner in &mut entities {
-                commands.entity(entities_despawner).despawn();
-            }
-        }
-    }
 }
