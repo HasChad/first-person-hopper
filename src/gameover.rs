@@ -84,9 +84,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                             parent.spawn(TextBundle::from_section(
                                 "GAME OVER",
                                 TextStyle {
-                                    font_size: 70.0,
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                                    font_size: 80.0,
                                     color: Color::BLACK,
-                                    ..default()
                                 },
                             ));
                         });
@@ -130,9 +130,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                             parent.spawn(TextBundle::from_section(
                                 "MAIN MENU",
                                 TextStyle {
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                                     font_size: 40.0,
                                     color: Color::rgb(0.9, 0.9, 0.9),
-                                    ..default()
                                 },
                             ));
                         });
@@ -159,9 +159,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                             parent.spawn(TextBundle::from_section(
                                 "RESTART",
                                 TextStyle {
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                                     font_size: 40.0,
                                     color: Color::rgb(0.9, 0.9, 0.9),
-                                    ..default()
                                 },
                             ));
                         });

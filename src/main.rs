@@ -1,11 +1,12 @@
 use bevy::{prelude::*, window::WindowMode};
-use gameover::GameOverPlugin;
-use ingame::InGamePlugin;
-use mainmenu::MainMenuPlugin;
 
 pub mod gameover;
 pub mod ingame;
 pub mod mainmenu;
+
+use gameover::GameOverPlugin;
+use ingame::InGamePlugin;
+use mainmenu::MainMenuPlugin;
 
 pub const SCREEN_WIDTH: f32 = 1280.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
@@ -35,6 +36,12 @@ fn main() {
         .run();
 }
 
+#[derive(Resource)]
+pub enum Scores {
+    HighScore(i32),
+    CurrentScore(i32),
+}
+
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 pub enum AppState {
     #[default]
@@ -51,7 +58,7 @@ pub enum GameDifficultyState {
     Hard,
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     //setup camera with debug-render.
     commands.spawn(Camera2dBundle::default());
     commands.spawn(SpriteBundle {

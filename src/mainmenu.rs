@@ -78,9 +78,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     parent.spawn(TextBundle::from_section(
                         "EASY",
                         TextStyle {
+                            font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                             font_size: 40.0,
                             color: Color::rgb(0.19, 0.76, 0.41),
-                            ..default()
                         },
                     ));
                 });
@@ -107,9 +107,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     parent.spawn(TextBundle::from_section(
                         "MEDIUM",
                         TextStyle {
+                            font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                             font_size: 40.0,
                             color: Color::rgb(0.35, 0.67, 0.89),
-                            ..default()
                         },
                     ));
                 });
@@ -136,9 +136,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     parent.spawn(TextBundle::from_section(
                         "HARD",
                         TextStyle {
+                            font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                             font_size: 40.0,
                             color: Color::rgb(0.88, 0.21, 0.20),
-                            ..default()
                         },
                     ));
                 });

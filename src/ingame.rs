@@ -17,7 +17,10 @@ struct CursorCrosshair;
 struct Ball;
 
 #[derive(Component)]
-struct M4;
+struct M4 {
+    lifetime: Timer,
+    okay_to_shoot: bool,
+}
 
 #[derive(Component)]
 struct EndGameTimer {
@@ -42,7 +45,12 @@ impl Plugin for InGamePlugin {
             )
             .add_systems(
                 Update,
-                (cursor_position, ball_movement, entity_despawner)
+                (
+                    cursor_position,
+                    ball_movement,
+                    entity_despawner,
+                    m4_shooting,
+                )
                     .run_if(in_state(AppState::InGame)),
             );
     }
@@ -177,7 +185,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Qu
             ..default()
         })
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)))
-        .insert(M4)
+        .insert(M4 {
+            lifetime: Timer::from_seconds(0.2, TimerMode::Once),
+            okay_to_shoot: true,
+        })
         .insert(InGameEntity);
 
     //crosshair and collision spawn
@@ -235,6 +246,19 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Qu
         .insert(InGameEntity);
 }
 
+fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
+    let mut m4_props = m4.single_mut();
+
+    if !m4_props.okay_to_shoot {
+        m4_props.lifetime.tick(time.delta());
+
+        if m4_props.lifetime.finished() {
+            m4_props.okay_to_shoot = true;
+            m4_props.lifetime = Timer::from_seconds(0.2, TimerMode::Once);
+        }
+    }
+}
+
 fn cursor_position(
     q_windows: Res<CursorInfo>,
     mut crosshair: Query<&mut Transform, With<CursorCrosshair>>,
@@ -259,6 +283,7 @@ fn cursor_position(
 fn ball_movement(
     mut commands: Commands,
     mut ball: Query<(Entity, &mut ExternalImpulse, &mut Velocity), With<Ball>>,
+    mut m4: Query<&mut M4>,
     crosshair: Query<Entity, With<CursorCrosshair>>,
     input: Res<Input<MouseButton>>,
     rapier_context: Res<RapierContext>,
@@ -266,9 +291,11 @@ fn ball_movement(
 ) {
     let entity_ball = ball.single().0;
     let entity_cross = crosshair.single();
+    let mut m4_props = m4.single_mut();
 
-    if input.just_pressed(MouseButton::Left) {
+    if input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
         //sound play
+        m4_props.okay_to_shoot = false;
         commands.spawn(AudioBundle {
             source: asset_server.load("sounds\\M16.ogg"),
             ..default()
@@ -277,6 +304,10 @@ fn ball_movement(
         //jump ball if collide eachother
         for (_, mut ball_impulse, mut ball_velocity) in &mut ball {
             if rapier_context.intersection_pair(entity_ball, entity_cross) == Some(true) {
+                commands.spawn(AudioBundle {
+                    source: asset_server.load("sounds\\click.ogg"),
+                    ..default()
+                });
                 ball_velocity.linvel.y = 0.0;
                 ball_velocity.linvel.x = 0.0;
                 ball_velocity.angvel = 0.0;
