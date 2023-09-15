@@ -4,7 +4,14 @@ use bevy_rapier2d::prelude::*;
 use crate::SCREEN_HEIGHT;
 use crate::SCREEN_WIDTH;
 
-pub static mut SCORE: i32 = 0;
+#[derive(Resource)]
+pub struct Scores {
+    pub current_score: i32,
+    pub high_score: i32,
+    pub easy_hscore: i32,
+    pub medium_hscore: i32,
+    pub hard_hscore: i32,
+}
 
 #[derive(Component)]
 pub struct InGameEntity;
@@ -136,10 +143,11 @@ pub fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut windows: Query<&mut Window>,
+    mut scores: ResMut<Scores>,
 ) {
     info!("Game Started");
 
-    unsafe { SCORE = 0 };
+    scores.current_score = 0;
 
     commands.spawn(AudioBundle {
         source: asset_server.load("sounds\\start.ogg"),

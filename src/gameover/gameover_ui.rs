@@ -4,33 +4,22 @@ use bevy::prelude::*;
 
 use crate::AppState;
 
-#[derive(Component)]
-struct HomeButton;
+use crate::ingame::spawn::Scores;
 
 #[derive(Component)]
-struct RestartButton;
+pub struct HomeButton;
 
 #[derive(Component)]
-struct GameOverEntity;
+pub struct RestartButton;
 
-pub struct GameOverPlugin;
-
-impl Plugin for GameOverPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::GameOver), setup)
-            .add_systems(
-                Update,
-                (home_button_system, restart_button_system).run_if(in_state(AppState::GameOver)),
-            )
-            .add_systems(OnExit(AppState::GameOver), entity_despawner);
-    }
-}
+#[derive(Component)]
+pub struct GameOverEntity;
 
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    info!("gameover menu activated");
+pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
+    info!("GameOver menu activated");
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("sprites\\menu_background.png"),
@@ -59,10 +48,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent
                 .spawn(NodeBundle {
                     style: Style {
-                        height: Val::Percent(50.0),
+                        height: Val::Percent(75.0),
                         width: Val::Percent(100.0),
+                        flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
-                        justify_content: JustifyContent::Center,
+                        justify_content: JustifyContent::End,
+                        row_gap: Val::Px(25.0),
                         ..default()
                     },
                     ..default()
@@ -87,23 +78,60 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                 "GAME OVER",
                                 TextStyle {
                                     font: asset_server.load("fonts/NotoSans-Medium.ttf"),
-                                    font_size: 80.0,
+                                    font_size: 100.0,
                                     color: Color::BLACK,
                                 },
                             ));
-                        })
-                        .with_children(|commands| {
-                            commands.spawn(TextBundle {
-                                text: Text::from_section(
-                                    "Money!",
-                                    TextStyle {
-                                        font: asset_server.load("fonts/NotoSans-Medium.ttf"),
-                                        font_size: 80.0,
-                                        color: Color::WHITE,
-                                    },
-                                ),
+                        });
+                })
+                //current score: create black background
+                .with_children(|parent| {
+                    parent
+                        .spawn(NodeBundle {
+                            style: Style {
+                                width: Val::Px(750.0),
+                                height: Val::Px(75.0),
+                                align_items: AlignItems::Center,
+                                justify_content: JustifyContent::Center,
                                 ..default()
-                            });
+                            },
+                            background_color: Color::BLACK.into(),
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                format!("SCORE: {}", scores.current_score),
+                                TextStyle {
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                                    font_size: 70.0,
+                                    color: Color::WHITE,
+                                },
+                            ));
+                        });
+                })
+                //high score: create black background
+                .with_children(|parent| {
+                    parent
+                        .spawn(NodeBundle {
+                            style: Style {
+                                width: Val::Px(750.0),
+                                height: Val::Px(75.0),
+                                align_items: AlignItems::Center,
+                                justify_content: JustifyContent::Center,
+                                ..default()
+                            },
+                            background_color: Color::BLACK.into(),
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                format!("HIGH SCORE: {}", scores.high_score),
+                                TextStyle {
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                                    font_size: 70.0,
+                                    color: Color::WHITE,
+                                },
+                            ));
                         });
                 });
         })
@@ -184,7 +212,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-fn home_button_system(
+pub fn home_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut interaction_query: Query<
@@ -213,7 +241,7 @@ fn home_button_system(
     }
 }
 
-fn restart_button_system(
+pub fn restart_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut interaction_query: Query<
@@ -242,7 +270,7 @@ fn restart_button_system(
     }
 }
 
-fn entity_despawner(mut entities: Query<Entity, With<GameOverEntity>>, mut commands: Commands) {
+pub fn entity_despawner(mut entities: Query<Entity, With<GameOverEntity>>, mut commands: Commands) {
     info!("Main Menu Despawner Activated");
 
     //despawn everyting in InGame

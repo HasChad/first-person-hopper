@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_arguments)]
+
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_cursor::prelude::*;
 use bevy_rapier2d::prelude::*;
@@ -8,13 +10,11 @@ use crate::ingame::Ball;
 use crate::ingame::CursorCrosshair;
 use crate::ingame::EndGameTimer;
 use crate::ingame::InGameEntity;
+use crate::ingame::Scores;
 use crate::ingame::M4;
-use crate::ingame::SCORE;
 
-pub(crate) static mut HIGH_SCORE: i32 = 0;
-pub static mut EASY_HSCORE: i32 = 0;
-pub static mut MEDIUM_HSCORE: i32 = 0;
-pub static mut HARD_HSCORE: i32 = 0;
+#[derive(Event)]
+pub struct JumpBallEvent;
 
 pub fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
     let mut m4_props = m4.single_mut();
@@ -51,42 +51,54 @@ pub fn cursor_position(
 }
 
 pub fn ball_movement(
-    mut commands: Commands,
-    mut ball: Query<(Entity, &mut ExternalImpulse, &mut Velocity), With<Ball>>,
-    mut m4: Query<&mut M4>,
-    crosshair: Query<Entity, With<CursorCrosshair>>,
-    input: Res<Input<MouseButton>>,
-    rapier_context: Res<RapierContext>,
-    asset_server: Res<AssetServer>,
+    mut scores: ResMut<Scores>,
+    mut ball: Query<(&mut ExternalImpulse, &mut Velocity), With<Ball>>,
+    mut event_reader: EventReader<JumpBallEvent>,
 ) {
-    let entity_ball = ball.single().0;
-    let entity_cross = crosshair.single();
+    //jump ball if collide eachother
+    for (mut ball_impulse, mut ball_velocity) in &mut ball {
+        for _event in event_reader.iter() {
+            scores.current_score += 1;
+            info!("{}", scores.current_score);
+            ball_velocity.linvel.y = 0.0;
+            ball_velocity.linvel.x = 0.0;
+            ball_velocity.angvel = 0.0;
+            ball_impulse.impulse.y = alea::f32_in_range(500000.0, 900000.0);
+            ball_impulse.impulse.x = alea::f32_in_range(-500000.0, 500000.0);
+            ball_impulse.torque_impulse = alea::f32_in_range(-10000000.0, 10000000.0);
+        }
+    }
+}
+
+pub fn ball_contact_checker(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    rapier_context: Res<RapierContext>,
+    ball: Query<Entity, With<Ball>>,
+    crosshair: Query<Entity, With<CursorCrosshair>>,
+    mut m4: Query<&mut M4>,
+    input: Res<Input<MouseButton>>,
+    mut event_writer: EventWriter<JumpBallEvent>,
+) {
+    let ball_entity = ball.single();
+    let cross_entity = crosshair.single();
     let mut m4_props = m4.single_mut();
 
     if input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
-        //sound play
+        //m4 sound play and 0 rate of fire
         m4_props.okay_to_shoot = false;
         commands.spawn(AudioBundle {
             source: asset_server.load("sounds\\M16.ogg"),
             ..default()
         });
 
-        //jump ball if collide eachother
-        for (_, mut ball_impulse, mut ball_velocity) in &mut ball {
-            if rapier_context.intersection_pair(entity_ball, entity_cross) == Some(true) {
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds\\click.ogg"),
-                    ..default()
-                });
-                unsafe { SCORE += 1 };
-                info!("{}", unsafe { SCORE.to_string() });
-                ball_velocity.linvel.y = 0.0;
-                ball_velocity.linvel.x = 0.0;
-                ball_velocity.angvel = 0.0;
-                ball_impulse.impulse.y = alea::f32_in_range(500000.0, 900000.0);
-                ball_impulse.impulse.x = alea::f32_in_range(-500000.0, 500000.0);
-                ball_impulse.torque_impulse = alea::f32_in_range(-10000000.0, 10000000.0);
-            }
+        //check jump ball collide
+        if rapier_context.intersection_pair(ball_entity, cross_entity) == Some(true) {
+            event_writer.send(JumpBallEvent);
+            commands.spawn(AudioBundle {
+                source: asset_server.load("sounds\\click.ogg"),
+                ..default()
+            });
         }
     }
 }
@@ -98,26 +110,34 @@ pub fn entity_despawner(
     ball: Query<(&Transform, &Ball)>,
     time: Res<Time>,
     mut windows: Query<&mut Window>,
+    mut scores: ResMut<Scores>,
 ) {
     if ball.single().0.translation.y < -420.0 {
-        info!("timer created");
-
         let ball_x = ball.single().1;
 
         match ball_x {
             Ball::Easy => {
-                if unsafe { SCORE > EASY_HSCORE } {
-                    unsafe { HIGH_SCORE = EASY_HSCORE }
+                scores.high_score = scores.easy_hscore;
+
+                if scores.current_score > scores.easy_hscore {
+                    scores.easy_hscore = scores.current_score;
+                    scores.high_score = scores.current_score
                 }
             }
             Ball::Medium => {
-                if unsafe { SCORE > EASY_HSCORE } {
-                    unsafe { HIGH_SCORE = EASY_HSCORE }
+                scores.high_score = scores.medium_hscore;
+
+                if scores.current_score > scores.medium_hscore {
+                    scores.medium_hscore = scores.current_score;
+                    scores.high_score = scores.current_score
                 }
             }
             Ball::Hard => {
-                if unsafe { SCORE > EASY_HSCORE } {
-                    unsafe { HIGH_SCORE = EASY_HSCORE }
+                scores.high_score = scores.hard_hscore;
+
+                if scores.current_score > scores.hard_hscore {
+                    scores.hard_hscore = scores.current_score;
+                    scores.high_score = scores.current_score
                 }
             }
         }

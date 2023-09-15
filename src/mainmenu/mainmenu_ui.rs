@@ -5,36 +5,24 @@ use bevy::prelude::*;
 use crate::AppState;
 use crate::GameDifficultyState;
 
-#[derive(Component)]
-struct EasyButton;
+use crate::ingame::spawn::Scores;
 
 #[derive(Component)]
-struct MediumButton;
+pub struct EasyButton;
 
 #[derive(Component)]
-struct HardButton;
+pub struct MediumButton;
 
 #[derive(Component)]
-struct MainMenuEntity;
+pub struct HardButton;
 
-pub struct MainMenuPlugin;
-
-impl Plugin for MainMenuPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::MainMenu), setup)
-            .add_systems(
-                Update,
-                (easy_button_system, medium_button_system, hard_button_system)
-                    .run_if(in_state(AppState::MainMenu)),
-            )
-            .add_systems(OnExit(AppState::MainMenu), entity_despawner);
-    }
-}
+#[derive(Component)]
+pub struct MainMenuEntity;
 
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("sprites\\menu_background.png"),
@@ -64,7 +52,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent
                 .spawn(ButtonBundle {
                     style: Style {
-                        width: Val::Px(150.0),
+                        width: Val::Px(200.0),
                         height: Val::Px(65.0),
                         border: UiRect::all(Val::Px(5.0)),
                         justify_content: JustifyContent::Center,
@@ -78,7 +66,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .insert(EasyButton)
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "EASY",
+                        format!("EASY: {}", scores.easy_hscore),
                         TextStyle {
                             font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                             font_size: 40.0,
@@ -91,12 +79,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent
                 .spawn(ButtonBundle {
                     style: Style {
-                        width: Val::Px(150.0),
+                        width: Val::Px(200.0),
                         height: Val::Px(65.0),
                         border: UiRect::all(Val::Px(5.0)),
-                        // horizontally center child text
                         justify_content: JustifyContent::Center,
-                        // vertically center child text
                         align_items: AlignItems::Center,
                         ..default()
                     },
@@ -107,7 +93,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .insert(MediumButton)
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "MEDIUM",
+                        format!("MEDIUM: {}", scores.medium_hscore),
                         TextStyle {
                             font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                             font_size: 40.0,
@@ -120,7 +106,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent
                 .spawn(ButtonBundle {
                     style: Style {
-                        width: Val::Px(150.0),
+                        width: Val::Px(200.0),
                         height: Val::Px(65.0),
                         border: UiRect::all(Val::Px(5.0)),
                         // horizontally center child text
@@ -136,7 +122,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .insert(HardButton)
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "HARD",
+                        format!("HARD: {}", scores.hard_hscore),
                         TextStyle {
                             font: asset_server.load("fonts/NotoSans-Medium.ttf"),
                             font_size: 40.0,
@@ -147,7 +133,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-fn easy_button_system(
+pub fn easy_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut interaction_query: Query<
@@ -177,7 +163,7 @@ fn easy_button_system(
     }
 }
 
-fn medium_button_system(
+pub fn medium_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut interaction_query: Query<
@@ -207,7 +193,7 @@ fn medium_button_system(
     }
 }
 
-fn hard_button_system(
+pub fn hard_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut interaction_query: Query<
@@ -237,7 +223,7 @@ fn hard_button_system(
     }
 }
 
-fn entity_despawner(mut entities: Query<Entity, With<MainMenuEntity>>, mut commands: Commands) {
+pub fn entity_despawner(mut entities: Query<Entity, With<MainMenuEntity>>, mut commands: Commands) {
     info!("Main Menu Despawner Activated");
 
     //despawn everyting in InGame
