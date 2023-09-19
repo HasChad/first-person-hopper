@@ -36,99 +36,144 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
             style: Style {
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),
-                flex_direction: FlexDirection::Row,
+                flex_direction: FlexDirection::Column,
                 // vertically center child text
                 align_items: AlignItems::Center,
                 // horizontally center child text
                 justify_content: JustifyContent::Center,
-                column_gap: Val::Px(100.0),
                 ..default()
             },
             ..default()
         })
         .insert(MainMenuEntity)
-        //spawn easy button
+        //title node bundle
         .with_children(|parent| {
             parent
-                .spawn(ButtonBundle {
+                .spawn(NodeBundle {
                     style: Style {
-                        width: Val::Px(200.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    border_color: BorderColor(Color::BLACK),
-                    background_color: NORMAL_BUTTON.into(),
-                    ..default()
-                })
-                .insert(EasyButton)
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        format!("EASY: {}", scores.easy_hscore),
-                        TextStyle {
-                            font: asset_server.load("fonts/NotoSans-Medium.ttf"),
-                            font_size: 40.0,
-                            color: Color::rgb(0.19, 0.76, 0.41),
-                        },
-                    ));
-                });
-
-            //spawn medium button
-            parent
-                .spawn(ButtonBundle {
-                    style: Style {
-                        width: Val::Px(200.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    border_color: BorderColor(Color::BLACK),
-                    background_color: NORMAL_BUTTON.into(),
-                    ..default()
-                })
-                .insert(MediumButton)
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        format!("MEDIUM: {}", scores.medium_hscore),
-                        TextStyle {
-                            font: asset_server.load("fonts/NotoSans-Medium.ttf"),
-                            font_size: 40.0,
-                            color: Color::rgb(0.35, 0.67, 0.89),
-                        },
-                    ));
-                });
-
-            //spawn hard button
-            parent
-                .spawn(ButtonBundle {
-                    style: Style {
-                        width: Val::Px(200.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
+                        height: Val::Percent(40.0),
+                        width: Val::Percent(100.0),
+                        flex_direction: FlexDirection::Row,
+                        // vertically center child text
+                        align_items: AlignItems::End,
                         // horizontally center child text
                         justify_content: JustifyContent::Center,
-                        // vertically center child text
-                        align_items: AlignItems::Center,
+                        column_gap: Val::Px(100.0),
                         ..default()
                     },
-                    border_color: BorderColor(Color::BLACK),
-                    background_color: NORMAL_BUTTON.into(),
                     ..default()
                 })
-                .insert(HardButton)
+                //title
                 .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        format!("HARD: {}", scores.hard_hscore),
-                        TextStyle {
-                            font: asset_server.load("fonts/NotoSans-Medium.ttf"),
-                            font_size: 40.0,
-                            color: Color::rgb(0.88, 0.21, 0.20),
+                    parent.spawn(ImageBundle {
+                        image: UiImage {
+                            texture: asset_server.load("sprites\\title.png"),
+                            ..default()
                         },
-                    ));
+                        ..default()
+                    });
+                });
+        })
+        //button node bundle
+        .with_children(|parent| {
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        height: Val::Percent(50.0),
+                        width: Val::Percent(100.0),
+                        flex_direction: FlexDirection::Row,
+                        // vertically center child text
+                        align_items: AlignItems::Center,
+                        // horizontally center child text
+                        justify_content: JustifyContent::Center,
+                        column_gap: Val::Px(100.0),
+                        ..default()
+                    },
+                    ..default()
+                })
+                //spawn easy button
+                .with_children(|parent| {
+                    parent
+                        .spawn(ButtonBundle {
+                            style: Style {
+                                width: Val::Px(200.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            border_color: BorderColor(Color::BLACK),
+                            background_color: NORMAL_BUTTON.into(),
+                            ..default()
+                        })
+                        .insert(EasyButton)
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                format!("EASY: {}", scores.easy_hscore),
+                                TextStyle {
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                                    font_size: 40.0,
+                                    color: Color::rgb(0.19, 0.76, 0.41),
+                                },
+                            ));
+                        });
+
+                    //spawn medium button
+                    parent
+                        .spawn(ButtonBundle {
+                            style: Style {
+                                width: Val::Px(200.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            border_color: BorderColor(Color::BLACK),
+                            background_color: NORMAL_BUTTON.into(),
+                            ..default()
+                        })
+                        .insert(MediumButton)
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                format!("MEDIUM: {}", scores.medium_hscore),
+                                TextStyle {
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                                    font_size: 40.0,
+                                    color: Color::rgb(0.35, 0.67, 0.89),
+                                },
+                            ));
+                        });
+
+                    //spawn hard button
+                    parent
+                        .spawn(ButtonBundle {
+                            style: Style {
+                                width: Val::Px(200.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                // horizontally center child text
+                                justify_content: JustifyContent::Center,
+                                // vertically center child text
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            border_color: BorderColor(Color::BLACK),
+                            background_color: NORMAL_BUTTON.into(),
+                            ..default()
+                        })
+                        .insert(HardButton)
+                        .with_children(|parent| {
+                            parent.spawn(TextBundle::from_section(
+                                format!("HARD: {}", scores.hard_hscore),
+                                TextStyle {
+                                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                                    font_size: 40.0,
+                                    color: Color::rgb(0.88, 0.21, 0.20),
+                                },
+                            ));
+                        });
                 });
         });
 }

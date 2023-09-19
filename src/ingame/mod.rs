@@ -20,6 +20,7 @@ impl Plugin for InGamePlugin {
             // ! .add_plugins(RapierDebugRenderPlugin::default())
             .add_plugins(CursorInfoPlugin)
             .add_event::<JumpBallEvent>()
+            .add_event::<ContactAnimationEvent>()
             .insert_resource(Scores {
                 current_score: 0,
                 high_score: 0,
@@ -40,6 +41,8 @@ impl Plugin for InGamePlugin {
             .add_systems(
                 Update,
                 (
+                    spawn,
+                    animate,
                     cursor_position,
                     ball_movement,
                     ball_contact_checker,

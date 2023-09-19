@@ -1,10 +1,9 @@
 #![allow(clippy::too_many_arguments)]
 
+use benimator::FrameRate;
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_cursor::prelude::*;
 use bevy_rapier2d::prelude::*;
-
-use crate::AppState;
 
 use crate::ingame::Ball;
 use crate::ingame::CursorCrosshair;
@@ -12,9 +11,82 @@ use crate::ingame::EndGameTimer;
 use crate::ingame::InGameEntity;
 use crate::ingame::Scores;
 use crate::ingame::M4;
+use crate::AppState;
 
 #[derive(Event)]
 pub struct JumpBallEvent;
+
+#[derive(Event)]
+pub struct ContactAnimationEvent;
+
+// Create the animation component
+// Note: you may make the animation an asset instead of a component
+#[derive(Component, Deref)]
+pub struct Animation(benimator::Animation);
+
+// Create the player component
+#[derive(Default, Component, Deref, DerefMut)]
+pub struct AnimationState(benimator::State);
+
+// ! start of animation
+pub fn spawn(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut textures: ResMut<Assets<TextureAtlas>>,
+    mut contact_event_reader: EventReader<ContactAnimationEvent>,
+    cursor_pos: Query<&Transform, With<CursorCrosshair>>,
+) {
+    for _event in contact_event_reader.iter() {
+        commands
+            // Spawn a bevy sprite-sheet
+            .spawn(SpriteSheetBundle {
+                texture_atlas: textures.add(TextureAtlas::from_grid(
+                    asset_server.load("sprites\\contact_sheet.png"),
+                    Vec2::new(48.0, 48.0),
+                    4,
+                    1,
+                    None,
+                    None,
+                )),
+                transform: Transform::from_xyz(
+                    cursor_pos.single().translation.x,
+                    cursor_pos.single().translation.y,
+                    -1.0,
+                ),
+                ..default()
+            })
+            //Create and insert an animation
+            .insert(Animation(benimator::Animation::once(
+                benimator::Animation::from_indices(0..=3, FrameRate::from_fps(16.0)),
+            )))
+            // Insert the state
+            .insert(AnimationState::default());
+    }
+}
+
+pub fn animate(
+    time: Res<Time>,
+    mut commands: Commands,
+    mut query: Query<(
+        Entity,
+        &mut AnimationState,
+        &mut TextureAtlasSprite,
+        &Animation,
+    )>,
+) {
+    for (entitys, mut anim_state, mut texture, animation) in query.iter_mut() {
+        // Update the state
+        anim_state.update(animation, time.delta());
+
+        // Update the texture atlas
+        texture.index = anim_state.frame_index();
+
+        if anim_state.is_ended() {
+            commands.entity(entitys).despawn();
+        }
+    }
+}
+// ! end of animation
 
 pub fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
     let mut m4_props = m4.single_mut();
@@ -79,6 +151,7 @@ pub fn ball_contact_checker(
     mut m4: Query<&mut M4>,
     input: Res<Input<MouseButton>>,
     mut event_writer: EventWriter<JumpBallEvent>,
+    mut contact_event_writer: EventWriter<ContactAnimationEvent>,
 ) {
     let ball_entity = ball.single();
     let cross_entity = crosshair.single();
@@ -95,6 +168,7 @@ pub fn ball_contact_checker(
         //check jump ball collide
         if rapier_context.intersection_pair(ball_entity, cross_entity) == Some(true) {
             event_writer.send(JumpBallEvent);
+            contact_event_writer.send(ContactAnimationEvent);
             commands.spawn(AudioBundle {
                 source: asset_server.load("sounds\\click.ogg"),
                 ..default()
