@@ -26,7 +26,10 @@ pub struct ContactAnimationEvent;
 #[derive(Event)]
 pub struct M4AnimationEvent;
 
-pub fn spawn(
+#[derive(Component)]
+pub struct FireComponent;
+
+pub fn contact_spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut textures: ResMut<Assets<TextureAtlas>>,
@@ -48,7 +51,7 @@ pub fn spawn(
                 transform: Transform::from_xyz(
                     cursor_pos.single().translation.x,
                     cursor_pos.single().translation.y,
-                    -1.0,
+                    -2.0,
                 ),
                 ..default()
             })
@@ -61,7 +64,7 @@ pub fn spawn(
     }
 }
 
-pub fn animate(
+pub fn contact_animation(
     time: Res<Time>,
     mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), Without<M4>>,
 ) {
@@ -80,7 +83,6 @@ pub fn m4_animation(
     mut play_animation: ResMut<PlayAnimation>,
 ) {
     if play_animation.0 {
-        info!("successs");
         for (mut anim_state, mut texture, animation) in query.iter_mut() {
             // Update the state
             anim_state.update(animation, time.delta());
@@ -93,6 +95,62 @@ pub fn m4_animation(
                 anim_state.reset();
             }
         }
+    }
+}
+
+pub fn fire_spawn(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut textures: ResMut<Assets<TextureAtlas>>,
+    cursor_pos: Query<&Transform, With<CursorCrosshair>>,
+    mut m4_event_reader: EventReader<M4AnimationEvent>,
+) {
+    for _event in m4_event_reader.iter() {
+        commands
+            // Spawn a bevy sprite-sheet
+            .spawn(SpriteSheetBundle {
+                texture_atlas: textures.add(TextureAtlas::from_grid(
+                    asset_server.load("sprites\\fire_sheet.png"),
+                    Vec2::new(432.0, 80.0),
+                    1,
+                    3,
+                    None,
+                    None,
+                )),
+                transform: Transform::from_xyz(
+                    cursor_pos.single().translation.x + 150.0,
+                    cursor_pos.single().translation.y - 100.0,
+                    -1.0,
+                ),
+                sprite: TextureAtlasSprite {
+                    color: Color::rgb(5.0, 5.0, 0.0),
+                    ..default()
+                },
+                ..default()
+            })
+            //Create and insert an animation
+            .insert(Animation(benimator::Animation::once(
+                benimator::Animation::from_indices(0..=2, benimator::FrameRate::from_fps(24.0)),
+            )))
+            // Insert the state
+            .insert(FireComponent)
+            .insert(AnimationState::default());
+    }
+}
+
+pub fn fire_animation(
+    time: Res<Time>,
+    mut query: Query<
+        (&mut AnimationState, &mut TextureAtlasSprite, &Animation),
+        With<FireComponent>,
+    >,
+) {
+    for (mut anim_state, mut texture, animation) in query.iter_mut() {
+        // Update the state
+        anim_state.update(animation, time.delta());
+
+        // Update the texture atlas
+        texture.index = anim_state.frame_index();
     }
 }
 
@@ -148,6 +206,7 @@ pub fn ball_contact_checker(
     mut event_writer: EventWriter<JumpBallEvent>,
     mut contact_event_writer: EventWriter<ContactAnimationEvent>,
     mut play_animation: ResMut<PlayAnimation>,
+    mut m4_animation_event: EventWriter<M4AnimationEvent>,
 ) {
     let ball_entity = ball.single();
     let cross_entity = crosshair.single();
@@ -157,6 +216,7 @@ pub fn ball_contact_checker(
         //m4 sound play and 0 rate of fire
         m4_props.okay_to_shoot = false;
         play_animation.0 = true;
+        m4_animation_event.send(M4AnimationEvent);
         info!("{:?}", play_animation.0);
         commands.spawn(AudioBundle {
             source: asset_server.load("sounds\\M16.ogg"),

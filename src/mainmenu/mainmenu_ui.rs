@@ -2,10 +2,9 @@
 
 use bevy::prelude::*;
 
+use crate::ingame::Scores;
 use crate::AppState;
 use crate::GameDifficultyState;
-
-use crate::ingame::spawn::Scores;
 
 #[derive(Component)]
 pub struct EasyButton;
@@ -23,13 +22,6 @@ const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
-    commands
-        .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\menu_background.png"),
-            transform: Transform::from_xyz(0.0, 0.0, -4.0),
-            ..default()
-        })
-        .insert(MainMenuEntity);
     //spawn full screen node bundle
     commands
         .spawn(NodeBundle {

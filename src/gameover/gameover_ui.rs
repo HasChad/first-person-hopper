@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 
-use crate::ingame::spawn::Scores;
+use crate::ingame::Scores;
 
 #[derive(Component)]
 pub struct HomeButton;
@@ -20,13 +20,6 @@ const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
     info!("GameOver menu activated");
-    commands
-        .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\menu_background.png"),
-            transform: Transform::from_xyz(0.0, 0.0, -4.0),
-            ..default()
-        })
-        .insert(GameOverEntity);
 
     //create full screen node bundle
     commands
@@ -63,7 +56,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     parent
                         .spawn(NodeBundle {
                             style: Style {
-                                width: Val::Px(1000.0),
+                                width: Val::Px(800.0),
                                 height: Val::Px(100.0),
                                 align_items: AlignItems::Center,
                                 justify_content: JustifyContent::Center,
@@ -78,7 +71,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                                 "GAME OVER",
                                 TextStyle {
                                     font: asset_server.load("fonts/NotoSans-Medium.ttf"),
-                                    font_size: 100.0,
+                                    font_size: 120.0,
                                     color: Color::BLACK,
                                 },
                             ));
@@ -89,7 +82,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     parent
                         .spawn(NodeBundle {
                             style: Style {
-                                width: Val::Px(750.0),
+                                width: Val::Px(550.0),
                                 height: Val::Px(75.0),
                                 align_items: AlignItems::Center,
                                 justify_content: JustifyContent::Center,
@@ -114,7 +107,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     parent
                         .spawn(NodeBundle {
                             style: Style {
-                                width: Val::Px(750.0),
+                                width: Val::Px(550.0),
                                 height: Val::Px(75.0),
                                 align_items: AlignItems::Center,
                                 justify_content: JustifyContent::Center,

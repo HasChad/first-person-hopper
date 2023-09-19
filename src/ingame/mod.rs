@@ -12,6 +12,15 @@ use gameplay::*;
 use ingame_ui::*;
 use spawn::*;
 
+#[derive(Resource)]
+pub struct Scores {
+    pub current_score: i32,
+    pub high_score: i32,
+    pub easy_hscore: i32,
+    pub medium_hscore: i32,
+    pub hard_hscore: i32,
+}
+
 // Create the animation component
 // Note: you may make the animation an asset instead of a component
 #[derive(Component, Deref)]
@@ -52,8 +61,10 @@ impl Plugin for InGamePlugin {
             .add_systems(
                 Update,
                 (
-                    spawn,
-                    animate,
+                    contact_spawn,
+                    contact_animation,
+                    fire_spawn,
+                    fire_animation,
                     m4_animation,
                     cursor_position,
                     ball_movement,

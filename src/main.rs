@@ -1,4 +1,8 @@
-use bevy::{prelude::*, window::WindowMode};
+use bevy::{
+    core_pipeline::{bloom::BloomSettings, tonemapping::Tonemapping},
+    prelude::*,
+    window::WindowMode,
+};
 
 pub mod gameover;
 pub mod ingame;
@@ -10,6 +14,22 @@ use mainmenu::MainMenuPlugin;
 
 pub const SCREEN_WIDTH: f32 = 1280.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
+
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+pub enum AppState {
+    #[default]
+    MainMenu,
+    InGame,
+    GameOver,
+}
+
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+pub enum GameDifficultyState {
+    Easy,
+    #[default]
+    Medium,
+    Hard,
+}
 
 fn main() {
     App::new()
@@ -36,34 +56,22 @@ fn main() {
         .run();
 }
 
-#[derive(Resource)]
-pub enum Scores {
-    HighScore(i32),
-    CurrentScore(i32),
-}
-
-#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-pub enum AppState {
-    #[default]
-    MainMenu,
-    InGame,
-    GameOver,
-}
-
-#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-pub enum GameDifficultyState {
-    Easy,
-    #[default]
-    Medium,
-    Hard,
-}
-
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     //setup camera with debug-render.
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((
+        Camera2dBundle {
+            camera: Camera {
+                hdr: true, // 1. HDR is required for bloom
+                ..default()
+            },
+            tonemapping: Tonemapping::TonyMcMapface, // 2. Using a tonemapper that desaturates to white is recommended
+            ..default()
+        },
+        BloomSettings::default(), // 3. Enable bloom for the camera
+    ));
     commands.spawn(SpriteBundle {
-        texture: asset_server.load("sprites\\background.png"),
-        transform: Transform::from_xyz(0.0, 0.0, -5.0),
+        texture: asset_server.load("sprites\\menu_background.png"),
+        transform: Transform::from_xyz(0.0, 0.0, -10.0),
         ..default()
     });
 }

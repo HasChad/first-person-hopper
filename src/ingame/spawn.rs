@@ -3,17 +3,9 @@ use bevy_rapier2d::prelude::*;
 
 use crate::ingame::Animation;
 use crate::ingame::AnimationState;
+use crate::ingame::Scores;
 use crate::SCREEN_HEIGHT;
 use crate::SCREEN_WIDTH;
-
-#[derive(Resource)]
-pub struct Scores {
-    pub current_score: i32,
-    pub high_score: i32,
-    pub easy_hscore: i32,
-    pub medium_hscore: i32,
-    pub hard_hscore: i32,
-}
 
 #[derive(Component)]
 pub struct InGameEntity;
@@ -39,24 +31,28 @@ pub struct EndGameTimer {
     pub lifetime: Timer,
 }
 
-pub fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServer>) {
-    info!("Hard ball created");
+pub fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServer>) {
+    info!("Easy ball created");
 
     //normal jump-ball spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\hard_ball.png"),
+            texture: asset_server.load("sprites\\easy_ball.png"),
+            sprite: Sprite {
+                color: Color::rgb(0.40, 1.5, 0.8),
+                ..default()
+            },
             ..default()
         })
-        .insert(Collider::ball(25.0))
+        .insert(Collider::ball(50.0))
         .insert(Sleeping {
             sleeping: true,
             ..default()
         })
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -1.0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -6.0)))
         .insert(RigidBody::Dynamic)
-        .insert(GravityScale(24.0))
-        .insert(ColliderMassProperties::Density(0.4))
+        .insert(GravityScale(17.0))
+        .insert(ColliderMassProperties::Density(0.1))
         .insert(Restitution {
             coefficient: 1.0,
             combine_rule: CoefficientCombineRule::Average,
@@ -69,7 +65,7 @@ pub fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServe
             impulse: Vec2::new(0.0, 0.0),
             torque_impulse: 0.0,
         })
-        .insert(Ball::Hard)
+        .insert(Ball::Easy)
         .insert(InGameEntity);
 }
 
@@ -80,6 +76,10 @@ pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetSer
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("sprites\\medium_ball.png"),
+            sprite: Sprite {
+                color: Color::rgb(0.7, 1.4, 1.8),
+                ..default()
+            },
             ..default()
         })
         .insert(Collider::ball(50.0))
@@ -87,7 +87,7 @@ pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetSer
             sleeping: true,
             ..default()
         })
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -1.0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -6.0)))
         .insert(RigidBody::Dynamic)
         .insert(GravityScale(30.0))
         .insert(ColliderMassProperties::Density(0.1))
@@ -107,24 +107,28 @@ pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetSer
         .insert(InGameEntity);
 }
 
-pub fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServer>) {
-    info!("Easy ball created");
+pub fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServer>) {
+    info!("Hard ball created");
 
     //normal jump-ball spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\easy_ball.png"),
+            texture: asset_server.load("sprites\\hard_ball.png"),
+            sprite: Sprite {
+                color: Color::rgb(1.8, 0.40, 0.40),
+                ..default()
+            },
             ..default()
         })
-        .insert(Collider::ball(50.0))
+        .insert(Collider::ball(25.0))
         .insert(Sleeping {
             sleeping: true,
             ..default()
         })
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -1.0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, -6.0)))
         .insert(RigidBody::Dynamic)
-        .insert(GravityScale(17.0))
-        .insert(ColliderMassProperties::Density(0.1))
+        .insert(GravityScale(24.0))
+        .insert(ColliderMassProperties::Density(0.4))
         .insert(Restitution {
             coefficient: 1.0,
             combine_rule: CoefficientCombineRule::Average,
@@ -137,7 +141,7 @@ pub fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServe
             impulse: Vec2::new(0.0, 0.0),
             torque_impulse: 0.0,
         })
-        .insert(Ball::Easy)
+        .insert(Ball::Hard)
         .insert(InGameEntity);
 }
 
@@ -169,12 +173,21 @@ pub fn setup(
         })
         .insert(InGameEntity);
 
+    //background spawn
+    commands
+        .spawn(SpriteBundle {
+            texture: asset_server.load("sprites\\background.png"),
+            transform: Transform::from_xyz(0.0, 0.0, -9.0),
+            ..default()
+        })
+        .insert(InGameEntity);
+
     //spawn m4 with animation props
     commands
         // Spawn a bevy sprite-sheet
         .spawn(SpriteSheetBundle {
             texture_atlas: textures.add(TextureAtlas::from_grid(
-                asset_server.load("sprites\\m4sheet.png"),
+                asset_server.load("sprites\\m4_sheet.png"),
                 Vec2::new(1550.0, 720.0),
                 5,
                 1,
@@ -197,24 +210,14 @@ pub fn setup(
         })
         .insert(InGameEntity);
 
-    /*
-    commands
-        .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\m4.png"),
-            ..default()
-        })
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)))
-        .insert(M4 {
-            lifetime: Timer::from_seconds(0.2, TimerMode::Once),
-            okay_to_shoot: true,
-        })
-        .insert(InGameEntity);
-    */
-
     //crosshair and collision spawn
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("sprites\\crosshair.png"),
+            sprite: Sprite {
+                color: Color::rgb(1.0, 1.0, 1.0),
+                ..default()
+            },
             ..default()
         })
         .insert(Collider::ball(5.0))
@@ -230,6 +233,7 @@ pub fn setup(
         .spawn(SpriteBundle {
             texture: asset_server.load("sprites\\wall.png"),
             sprite: Sprite {
+                color: Color::rgba(5.0, 5.0, 5.0, 0.1),
                 flip_x: true,
                 ..default()
             },
@@ -239,7 +243,7 @@ pub fn setup(
         .insert(TransformBundle::from(Transform::from_xyz(
             SCREEN_WIDTH / 2.0,
             0.0,
-            -1.0,
+            -6.0,
         )))
         .insert(Friction {
             coefficient: 0.0,
@@ -251,13 +255,17 @@ pub fn setup(
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("sprites\\wall.png"),
+            sprite: Sprite {
+                color: Color::rgba(5.0, 5.0, 5.0, 0.1),
+                ..default()
+            },
             ..default()
         })
         .insert(Collider::cuboid(100.0, SCREEN_HEIGHT / 2.0 + 500.0))
         .insert(TransformBundle::from(Transform::from_xyz(
             -SCREEN_WIDTH / 2.0,
             0.0,
-            -1.0,
+            -6.0,
         )))
         .insert(Friction {
             coefficient: 0.0,
