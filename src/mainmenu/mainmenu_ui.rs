@@ -51,7 +51,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
             parent
                 .spawn(NodeBundle {
                     style: Style {
-                        height: Val::Percent(40.0),
+                        height: Val::Percent(30.0),
                         width: Val::Percent(100.0),
                         flex_direction: FlexDirection::Row,
                         // vertically center child text

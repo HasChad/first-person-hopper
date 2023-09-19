@@ -12,6 +12,15 @@ use gameplay::*;
 use ingame_ui::*;
 use spawn::*;
 
+// Create the animation component
+// Note: you may make the animation an asset instead of a component
+#[derive(Component, Deref)]
+pub struct Animation(benimator::Animation);
+
+// Create the player component
+#[derive(Default, Component, Deref, DerefMut)]
+pub struct AnimationState(benimator::State);
+
 pub struct InGamePlugin;
 
 impl Plugin for InGamePlugin {
@@ -21,6 +30,8 @@ impl Plugin for InGamePlugin {
             .add_plugins(CursorInfoPlugin)
             .add_event::<JumpBallEvent>()
             .add_event::<ContactAnimationEvent>()
+            .add_event::<M4AnimationEvent>()
+            .insert_resource(PlayAnimation(false))
             .insert_resource(Scores {
                 current_score: 0,
                 high_score: 0,
@@ -33,9 +44,9 @@ impl Plugin for InGamePlugin {
                 (
                     setup,
                     ui_setup,
+                    game_difficulty_easy.run_if(in_state(GameDifficultyState::Easy)),
                     game_difficulty_medium.run_if(in_state(GameDifficultyState::Medium)),
                     game_difficulty_hard.run_if(in_state(GameDifficultyState::Hard)),
-                    game_difficulty_easy.run_if(in_state(GameDifficultyState::Easy)),
                 ),
             )
             .add_systems(
@@ -43,6 +54,7 @@ impl Plugin for InGamePlugin {
                 (
                     spawn,
                     animate,
+                    m4_animation,
                     cursor_position,
                     ball_movement,
                     ball_contact_checker,

@@ -1,10 +1,11 @@
 #![allow(clippy::too_many_arguments)]
 
-use benimator::FrameRate;
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_cursor::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+use crate::ingame::Animation;
+use crate::ingame::AnimationState;
 use crate::ingame::Ball;
 use crate::ingame::CursorCrosshair;
 use crate::ingame::EndGameTimer;
@@ -13,22 +14,18 @@ use crate::ingame::Scores;
 use crate::ingame::M4;
 use crate::AppState;
 
+#[derive(Resource)]
+pub struct PlayAnimation(pub bool);
+
 #[derive(Event)]
 pub struct JumpBallEvent;
 
 #[derive(Event)]
 pub struct ContactAnimationEvent;
 
-// Create the animation component
-// Note: you may make the animation an asset instead of a component
-#[derive(Component, Deref)]
-pub struct Animation(benimator::Animation);
+#[derive(Event)]
+pub struct M4AnimationEvent;
 
-// Create the player component
-#[derive(Default, Component, Deref, DerefMut)]
-pub struct AnimationState(benimator::State);
-
-// ! start of animation
 pub fn spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -43,7 +40,7 @@ pub fn spawn(
                 texture_atlas: textures.add(TextureAtlas::from_grid(
                     asset_server.load("sprites\\contact_sheet.png"),
                     Vec2::new(48.0, 48.0),
-                    4,
+                    5,
                     1,
                     None,
                     None,
@@ -57,7 +54,7 @@ pub fn spawn(
             })
             //Create and insert an animation
             .insert(Animation(benimator::Animation::once(
-                benimator::Animation::from_indices(0..=3, FrameRate::from_fps(16.0)),
+                benimator::Animation::from_indices(0..=4, benimator::FrameRate::from_fps(16.0)),
             )))
             // Insert the state
             .insert(AnimationState::default());
@@ -66,37 +63,35 @@ pub fn spawn(
 
 pub fn animate(
     time: Res<Time>,
-    mut commands: Commands,
-    mut query: Query<(
-        Entity,
-        &mut AnimationState,
-        &mut TextureAtlasSprite,
-        &Animation,
-    )>,
+    mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), Without<M4>>,
 ) {
-    for (entitys, mut anim_state, mut texture, animation) in query.iter_mut() {
+    for (mut anim_state, mut texture, animation) in query.iter_mut() {
         // Update the state
         anim_state.update(animation, time.delta());
 
         // Update the texture atlas
         texture.index = anim_state.frame_index();
-
-        if anim_state.is_ended() {
-            commands.entity(entitys).despawn();
-        }
     }
 }
-// ! end of animation
 
-pub fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
-    let mut m4_props = m4.single_mut();
+pub fn m4_animation(
+    time: Res<Time>,
+    mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), With<M4>>,
+    mut play_animation: ResMut<PlayAnimation>,
+) {
+    if play_animation.0 {
+        info!("successs");
+        for (mut anim_state, mut texture, animation) in query.iter_mut() {
+            // Update the state
+            anim_state.update(animation, time.delta());
 
-    if !m4_props.okay_to_shoot {
-        m4_props.lifetime.tick(time.delta());
+            // Update the texture atlas
+            texture.index = anim_state.frame_index();
 
-        if m4_props.lifetime.finished() {
-            m4_props.okay_to_shoot = true;
-            m4_props.lifetime = Timer::from_seconds(0.2, TimerMode::Once);
+            if anim_state.frame_index() == 4 {
+                play_animation.0 = false;
+                anim_state.reset();
+            }
         }
     }
 }
@@ -128,8 +123,8 @@ pub fn ball_movement(
     mut event_reader: EventReader<JumpBallEvent>,
 ) {
     //jump ball if collide eachother
-    for (mut ball_impulse, mut ball_velocity) in &mut ball {
-        for _event in event_reader.iter() {
+    for _event in event_reader.iter() {
+        for (mut ball_impulse, mut ball_velocity) in &mut ball {
             scores.current_score += 1;
             info!("{}", scores.current_score);
             ball_velocity.linvel.y = 0.0;
@@ -152,6 +147,7 @@ pub fn ball_contact_checker(
     input: Res<Input<MouseButton>>,
     mut event_writer: EventWriter<JumpBallEvent>,
     mut contact_event_writer: EventWriter<ContactAnimationEvent>,
+    mut play_animation: ResMut<PlayAnimation>,
 ) {
     let ball_entity = ball.single();
     let cross_entity = crosshair.single();
@@ -160,6 +156,8 @@ pub fn ball_contact_checker(
     if input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
         //m4 sound play and 0 rate of fire
         m4_props.okay_to_shoot = false;
+        play_animation.0 = true;
+        info!("{:?}", play_animation.0);
         commands.spawn(AudioBundle {
             source: asset_server.load("sounds\\M16.ogg"),
             ..default()
@@ -173,6 +171,19 @@ pub fn ball_contact_checker(
                 source: asset_server.load("sounds\\click.ogg"),
                 ..default()
             });
+        }
+    }
+}
+
+pub fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
+    let mut m4_props = m4.single_mut();
+
+    if !m4_props.okay_to_shoot {
+        m4_props.lifetime.tick(time.delta());
+
+        if m4_props.lifetime.finished() {
+            m4_props.okay_to_shoot = true;
+            m4_props.lifetime = Timer::from_seconds(0.2, TimerMode::Once);
         }
     }
 }

@@ -1,6 +1,8 @@
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_rapier2d::prelude::*;
 
+use crate::ingame::Animation;
+use crate::ingame::AnimationState;
 use crate::SCREEN_HEIGHT;
 use crate::SCREEN_WIDTH;
 
@@ -144,6 +146,7 @@ pub fn setup(
     asset_server: Res<AssetServer>,
     mut windows: Query<&mut Window>,
     mut scores: ResMut<Scores>,
+    mut textures: ResMut<Assets<TextureAtlas>>,
 ) {
     info!("Game Started");
 
@@ -154,19 +157,47 @@ pub fn setup(
         ..default()
     });
 
-    //timer creation
+    //lock and hide crosshair
+    let mut window = windows.single_mut();
+    window.cursor.visible = false;
+    window.cursor.grab_mode = CursorGrabMode::Locked;
+
+    //end game timer creation
     commands
         .spawn(EndGameTimer {
             lifetime: Timer::from_seconds(0.5, TimerMode::Once),
         })
         .insert(InGameEntity);
 
-    //lock and hide crosshair
-    let mut window = windows.single_mut();
-    window.cursor.visible = false;
-    window.cursor.grab_mode = CursorGrabMode::Confined;
+    //spawn m4 with animation props
+    commands
+        // Spawn a bevy sprite-sheet
+        .spawn(SpriteSheetBundle {
+            texture_atlas: textures.add(TextureAtlas::from_grid(
+                asset_server.load("sprites\\m4sheet.png"),
+                Vec2::new(1550.0, 720.0),
+                5,
+                1,
+                None,
+                None,
+            )),
+            ..default()
+        })
+        //Create and insert an animation
+        .insert(Animation(benimator::Animation::from_indices(
+            0..=4,
+            benimator::FrameRate::from_fps(30.0),
+        )))
+        // Insert the state
+        .insert(AnimationState::default())
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)))
+        .insert(M4 {
+            lifetime: Timer::from_seconds(0.2, TimerMode::Once),
+            okay_to_shoot: true,
+        })
+        .insert(InGameEntity);
 
-    //spawn m4
+    /*
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("sprites\\m4.png"),
@@ -178,6 +209,7 @@ pub fn setup(
             okay_to_shoot: true,
         })
         .insert(InGameEntity);
+    */
 
     //crosshair and collision spawn
     commands
