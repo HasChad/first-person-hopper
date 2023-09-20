@@ -2,6 +2,7 @@
 name = "bevy-2d-fps"
 version = "0.1.0"
 edition = "2021"
+author = "HasChad"
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]

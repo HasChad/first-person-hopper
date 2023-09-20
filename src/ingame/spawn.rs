@@ -164,7 +164,7 @@ pub fn setup(
     //lock and hide crosshair
     let mut window = windows.single_mut();
     window.cursor.visible = false;
-    window.cursor.grab_mode = CursorGrabMode::Locked;
+    window.cursor.grab_mode = CursorGrabMode::Confined;
 
     //end game timer creation
     commands

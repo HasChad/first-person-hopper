@@ -30,8 +30,22 @@ pub fn cursor_position(
     q_windows: Res<CursorInfo>,
     mut crosshair: Query<&mut Transform, With<CursorCrosshair>>,
     mut m4: Query<&mut Transform, (With<M4>, Without<CursorCrosshair>)>,
+    //camera_q: Query<(&Camera, &GlobalTransform)>,
+    //windows: Query<&Window>,
 ) {
-    let Some(position) = q_windows.position() else {
+    /*  alternative mouse position finder
+    let (camera, camera_transform) = camera_q.single();
+
+    let Some(mouse_position) = windows
+        .single()
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
+    else {
+        return;
+    };
+    */
+
+    let Some(mouse_position) = q_windows.position() else {
         return; //info!("out of window");
     };
 
@@ -39,11 +53,11 @@ pub fn cursor_position(
 
     for mut crosshair_pos in &mut crosshair {
         //crosshair position
-        crosshair_pos.translation.x = position.x;
-        crosshair_pos.translation.y = position.y;
+        crosshair_pos.translation.x = mouse_position.x;
+        crosshair_pos.translation.y = mouse_position.y;
         //m4 position relative to cursor position
-        m4_position.translation.x = position.x + 350.0;
-        m4_position.translation.y = position.y - 400.0;
+        m4_position.translation.x = mouse_position.x + 350.0;
+        m4_position.translation.y = mouse_position.y - 400.0;
     }
 }
 
