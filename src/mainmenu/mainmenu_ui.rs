@@ -78,7 +78,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                         align_items: AlignItems::Center,
                         // horizontally center child text
                         justify_content: JustifyContent::Center,
-                        column_gap: Val::Px(100.0),
+                        column_gap: Val::Px(75.0),
                         ..default()
                     },
                     ..default()
@@ -88,7 +88,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     parent
                         .spawn(ButtonBundle {
                             style: Style {
-                                width: Val::Px(200.0),
+                                width: Val::Px(220.0),
                                 height: Val::Px(65.0),
                                 border: UiRect::all(Val::Px(5.0)),
                                 justify_content: JustifyContent::Center,
@@ -115,7 +115,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     parent
                         .spawn(ButtonBundle {
                             style: Style {
-                                width: Val::Px(200.0),
+                                width: Val::Px(220.0),
                                 height: Val::Px(65.0),
                                 border: UiRect::all(Val::Px(5.0)),
                                 justify_content: JustifyContent::Center,
@@ -142,7 +142,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     parent
                         .spawn(ButtonBundle {
                             style: Style {
-                                width: Val::Px(200.0),
+                                width: Val::Px(220.0),
                                 height: Val::Px(65.0),
                                 border: UiRect::all(Val::Px(5.0)),
                                 // horizontally center child text

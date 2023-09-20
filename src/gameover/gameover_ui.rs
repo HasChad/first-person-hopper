@@ -21,6 +21,11 @@ const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
     info!("GameOver menu activated");
 
+    commands.spawn(AudioBundle {
+        source: asset_server.load("sounds\\gameover_sound.ogg"),
+        ..default()
+    });
+
     //create full screen node bundle
     commands
         .spawn(NodeBundle {

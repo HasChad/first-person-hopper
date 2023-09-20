@@ -26,134 +26,6 @@ pub struct ContactAnimationEvent;
 #[derive(Event)]
 pub struct M4AnimationEvent;
 
-#[derive(Component)]
-pub struct FireComponent;
-
-pub fn contact_spawn(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut textures: ResMut<Assets<TextureAtlas>>,
-    mut contact_event_reader: EventReader<ContactAnimationEvent>,
-    cursor_pos: Query<&Transform, With<CursorCrosshair>>,
-) {
-    for _event in contact_event_reader.iter() {
-        commands
-            // Spawn a bevy sprite-sheet
-            .spawn(SpriteSheetBundle {
-                texture_atlas: textures.add(TextureAtlas::from_grid(
-                    asset_server.load("sprites\\contact_sheet.png"),
-                    Vec2::new(48.0, 48.0),
-                    5,
-                    1,
-                    None,
-                    None,
-                )),
-                transform: Transform::from_xyz(
-                    cursor_pos.single().translation.x,
-                    cursor_pos.single().translation.y,
-                    -2.0,
-                ),
-                ..default()
-            })
-            //Create and insert an animation
-            .insert(Animation(benimator::Animation::once(
-                benimator::Animation::from_indices(0..=4, benimator::FrameRate::from_fps(16.0)),
-            )))
-            // Insert the state
-            .insert(AnimationState::default());
-    }
-}
-
-pub fn contact_animation(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), Without<M4>>,
-) {
-    for (mut anim_state, mut texture, animation) in query.iter_mut() {
-        // Update the state
-        anim_state.update(animation, time.delta());
-
-        // Update the texture atlas
-        texture.index = anim_state.frame_index();
-    }
-}
-
-pub fn m4_animation(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), With<M4>>,
-    mut play_animation: ResMut<PlayAnimation>,
-) {
-    if play_animation.0 {
-        for (mut anim_state, mut texture, animation) in query.iter_mut() {
-            // Update the state
-            anim_state.update(animation, time.delta());
-
-            // Update the texture atlas
-            texture.index = anim_state.frame_index();
-
-            if anim_state.frame_index() == 4 {
-                play_animation.0 = false;
-                anim_state.reset();
-            }
-        }
-    }
-}
-
-pub fn fire_spawn(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut textures: ResMut<Assets<TextureAtlas>>,
-    cursor_pos: Query<&Transform, With<CursorCrosshair>>,
-    mut m4_event_reader: EventReader<M4AnimationEvent>,
-) {
-    for _event in m4_event_reader.iter() {
-        commands
-            // Spawn a bevy sprite-sheet
-            .spawn(SpriteSheetBundle {
-                texture_atlas: textures.add(TextureAtlas::from_grid(
-                    asset_server.load("sprites\\fire_sheet.png"),
-                    Vec2::new(432.0, 80.0),
-                    1,
-                    3,
-                    None,
-                    None,
-                )),
-                transform: Transform::from_xyz(
-                    cursor_pos.single().translation.x + 150.0,
-                    cursor_pos.single().translation.y - 100.0,
-                    -1.0,
-                ),
-                sprite: TextureAtlasSprite {
-                    color: Color::rgb(5.0, 5.0, 0.0),
-                    ..default()
-                },
-                ..default()
-            })
-            //Create and insert an animation
-            .insert(Animation(benimator::Animation::once(
-                benimator::Animation::from_indices(0..=2, benimator::FrameRate::from_fps(24.0)),
-            )))
-            // Insert the state
-            .insert(FireComponent)
-            .insert(AnimationState::default());
-    }
-}
-
-pub fn fire_animation(
-    time: Res<Time>,
-    mut query: Query<
-        (&mut AnimationState, &mut TextureAtlasSprite, &Animation),
-        With<FireComponent>,
-    >,
-) {
-    for (mut anim_state, mut texture, animation) in query.iter_mut() {
-        // Update the state
-        anim_state.update(animation, time.delta());
-
-        // Update the texture atlas
-        texture.index = anim_state.frame_index();
-    }
-}
-
 pub fn cursor_position(
     q_windows: Res<CursorInfo>,
     mut crosshair: Query<&mut Transform, With<CursorCrosshair>>,
@@ -198,14 +70,14 @@ pub fn ball_movement(
 pub fn ball_contact_checker(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    input: Res<Input<MouseButton>>,
     rapier_context: Res<RapierContext>,
     ball: Query<Entity, With<Ball>>,
     crosshair: Query<Entity, With<CursorCrosshair>>,
     mut m4: Query<&mut M4>,
-    input: Res<Input<MouseButton>>,
+    mut play_animation: ResMut<PlayAnimation>,
     mut event_writer: EventWriter<JumpBallEvent>,
     mut contact_event_writer: EventWriter<ContactAnimationEvent>,
-    mut play_animation: ResMut<PlayAnimation>,
     mut m4_animation_event: EventWriter<M4AnimationEvent>,
 ) {
     let ball_entity = ball.single();
@@ -219,7 +91,7 @@ pub fn ball_contact_checker(
         m4_animation_event.send(M4AnimationEvent);
         info!("{:?}", play_animation.0);
         commands.spawn(AudioBundle {
-            source: asset_server.load("sounds\\M16.ogg"),
+            source: asset_server.load("sounds\\M4.ogg"),
             ..default()
         });
 
@@ -227,73 +99,57 @@ pub fn ball_contact_checker(
         if rapier_context.intersection_pair(ball_entity, cross_entity) == Some(true) {
             event_writer.send(JumpBallEvent);
             contact_event_writer.send(ContactAnimationEvent);
-            commands.spawn(AudioBundle {
-                source: asset_server.load("sounds\\click.ogg"),
-                ..default()
-            });
         }
     }
 }
 
-pub fn m4_shooting(mut m4: Query<&mut M4>, time: Res<Time>) {
-    let mut m4_props = m4.single_mut();
+pub fn m4_firerate_timer(mut m4: Query<&mut M4>, time: Res<Time>) {
+    let mut m4_timer = m4.single_mut();
 
-    if !m4_props.okay_to_shoot {
-        m4_props.lifetime.tick(time.delta());
+    if !m4_timer.okay_to_shoot {
+        m4_timer.lifetime.tick(time.delta());
 
-        if m4_props.lifetime.finished() {
-            m4_props.okay_to_shoot = true;
-            m4_props.lifetime = Timer::from_seconds(0.2, TimerMode::Once);
+        if m4_timer.lifetime.finished() {
+            m4_timer.okay_to_shoot = true;
+            m4_timer.lifetime = Timer::from_seconds(0.2, TimerMode::Once);
         }
     }
 }
 
-pub fn entity_despawner(
-    mut timer: Query<&mut EndGameTimer>,
-    mut entities: Query<Entity, With<InGameEntity>>,
+pub fn m4_animation(
+    time: Res<Time>,
+    mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), With<M4>>,
+    mut play_animation: ResMut<PlayAnimation>,
+) {
+    if play_animation.0 {
+        for (mut anim_state, mut texture, animation) in query.iter_mut() {
+            // Update the state
+            anim_state.update(animation, time.delta());
+
+            // Update the texture atlas
+            texture.index = anim_state.frame_index();
+
+            if anim_state.frame_index() == 4 {
+                play_animation.0 = false;
+                anim_state.reset();
+            }
+        }
+    }
+}
+
+pub fn gameover_controller(
     mut commands: Commands,
-    ball: Query<(&Transform, &Ball)>,
+    mut timer: Query<&mut EndGameTimer>,
+    ball: Query<&Transform, With<Ball>>,
     time: Res<Time>,
     mut windows: Query<&mut Window>,
-    mut scores: ResMut<Scores>,
 ) {
-    if ball.single().0.translation.y < -420.0 {
-        let ball_x = ball.single().1;
-
-        match ball_x {
-            Ball::Easy => {
-                scores.high_score = scores.easy_hscore;
-
-                if scores.current_score > scores.easy_hscore {
-                    scores.easy_hscore = scores.current_score;
-                    scores.high_score = scores.current_score
-                }
-            }
-            Ball::Medium => {
-                scores.high_score = scores.medium_hscore;
-
-                if scores.current_score > scores.medium_hscore {
-                    scores.medium_hscore = scores.current_score;
-                    scores.high_score = scores.current_score
-                }
-            }
-            Ball::Hard => {
-                scores.high_score = scores.hard_hscore;
-
-                if scores.current_score > scores.hard_hscore {
-                    scores.hard_hscore = scores.current_score;
-                    scores.high_score = scores.current_score
-                }
-            }
-        }
-
+    if ball.single().translation.y < -420.0 {
         let mut end_game_timer = timer.single_mut();
 
         end_game_timer.lifetime.tick(time.delta());
 
         if end_game_timer.lifetime.finished() {
-            info!("Despawner Activated");
-
             //enable cursor
             let mut window = windows.single_mut();
             window.cursor.visible = true;
@@ -301,11 +157,47 @@ pub fn entity_despawner(
 
             //change state
             commands.insert_resource(NextState(Some(AppState::GameOver)));
+        }
+    }
+}
 
-            //despawn everyting in InGame
-            for entities_despawner in &mut entities {
-                commands.entity(entities_despawner).despawn();
+pub fn entity_despawner(
+    mut commands: Commands,
+    ball: Query<&Ball>,
+    mut entities: Query<Entity, With<InGameEntity>>,
+    mut scores: ResMut<Scores>,
+) {
+    let ball_diff = ball.single();
+
+    match ball_diff {
+        Ball::Easy => {
+            scores.high_score = scores.easy_hscore;
+
+            if scores.current_score > scores.easy_hscore {
+                scores.easy_hscore = scores.current_score;
+                scores.high_score = scores.current_score
             }
         }
+        Ball::Medium => {
+            scores.high_score = scores.medium_hscore;
+
+            if scores.current_score > scores.medium_hscore {
+                scores.medium_hscore = scores.current_score;
+                scores.high_score = scores.current_score
+            }
+        }
+        Ball::Hard => {
+            scores.high_score = scores.hard_hscore;
+
+            if scores.current_score > scores.hard_hscore {
+                scores.hard_hscore = scores.current_score;
+                scores.high_score = scores.current_score
+            }
+        }
+    }
+
+    //despawn everyting in InGame
+    for entities_despawner in &mut entities {
+        commands.entity(entities_despawner).despawn();
     }
 }

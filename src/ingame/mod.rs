@@ -2,12 +2,14 @@ use bevy::prelude::*;
 use bevy_cursor::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+pub mod animations;
 pub mod gameplay;
 pub mod ingame_ui;
 pub mod spawn;
 
 use crate::AppState;
 use crate::GameDifficultyState;
+use animations::*;
 use gameplay::*;
 use ingame_ui::*;
 use spawn::*;
@@ -65,15 +67,17 @@ impl Plugin for InGamePlugin {
                     contact_animation,
                     fire_spawn,
                     fire_animation,
+                    bullet_case_despawn,
                     m4_animation,
                     cursor_position,
                     ball_movement,
                     ball_contact_checker,
-                    entity_despawner,
-                    m4_shooting,
+                    m4_firerate_timer,
                     ui_update,
+                    gameover_controller,
                 )
                     .run_if(in_state(AppState::InGame)),
-            );
+            )
+            .add_systems(OnExit(AppState::InGame), entity_despawner);
     }
 }
