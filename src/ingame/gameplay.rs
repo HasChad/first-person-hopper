@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 
 use bevy::{prelude::*, window::CursorGrabMode};
+use bevy_kira_audio::prelude::*;
 use bevy_rapier2d::prelude::*;
 use rand::Rng;
 
@@ -78,8 +79,8 @@ pub fn ball_movement(
 }
 
 pub fn ball_contact_checker(
-    mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     input: Res<Input<MouseButton>>,
     rapier_context: Res<RapierContext>,
     ball: Query<Entity, With<Ball>>,
@@ -100,10 +101,7 @@ pub fn ball_contact_checker(
         play_animation.0 = true;
         m4_animation_event.send(M4AnimationEvent);
         info!("{:?}", play_animation.0);
-        commands.spawn(AudioBundle {
-            source: asset_server.load("sounds/M4.ogg"),
-            ..default()
-        });
+        audio.play(asset_server.load("sounds/M4.ogg"));
 
         //check jump ball collide
         if rapier_context.intersection_pair(ball_entity, cross_entity) == Some(true) {

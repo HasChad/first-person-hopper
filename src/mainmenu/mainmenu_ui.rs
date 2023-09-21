@@ -1,6 +1,7 @@
 #![allow(clippy::complexity)]
 
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::*;
 
 use crate::ingame::Scores;
 use crate::AppState;
@@ -173,6 +174,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
 pub fn easy_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<EasyButton>),
@@ -187,10 +189,7 @@ pub fn easy_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds/hover_button.ogg"),
-                    ..default()
-                });
+                audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
@@ -203,6 +202,7 @@ pub fn easy_button_system(
 pub fn medium_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<MediumButton>),
@@ -217,10 +217,7 @@ pub fn medium_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds/hover_button.ogg"),
-                    ..default()
-                });
+                audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
@@ -233,6 +230,7 @@ pub fn medium_button_system(
 pub fn hard_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<HardButton>),
@@ -247,10 +245,7 @@ pub fn hard_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds/hover_button.ogg"),
-                    ..default()
-                });
+                audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();

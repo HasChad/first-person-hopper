@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::*;
 use bevy_rapier2d::prelude::*;
 use rand::Rng;
 
@@ -143,6 +144,7 @@ pub fn fire_animation(
 pub fn bullet_case_despawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     mut casing: Query<(Entity, &mut BulletCase)>,
     time: Res<Time>,
 ) {
@@ -151,10 +153,7 @@ pub fn bullet_case_despawn(
 
         if casing_timer.lifetime.finished() {
             commands.entity(casing_entity).despawn();
-            commands.spawn(AudioBundle {
-                source: asset_server.load("sounds/casing.ogg"),
-                ..default()
-            });
+            audio.play(asset_server.load("sounds/casing.ogg"));
         }
     }
 }

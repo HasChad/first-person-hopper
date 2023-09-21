@@ -1,4 +1,5 @@
 use bevy::{prelude::*, window::CursorGrabMode};
+use bevy_kira_audio::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::ingame::Animation;
@@ -34,6 +35,7 @@ pub struct EndGameTimer {
 pub fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     mut windows: Query<&mut Window>,
     mut scores: ResMut<Scores>,
     mut textures: ResMut<Assets<TextureAtlas>>,
@@ -42,14 +44,11 @@ pub fn setup(
 
     scores.current_score = 0;
 
-    commands.spawn(AudioBundle {
-        source: asset_server.load("sounds/start.ogg"),
-        ..default()
-    });
+    audio.play(asset_server.load("sounds/start.ogg"));
 
     //lock and hide crosshair
     let mut window = windows.single_mut();
-    window.cursor.visible = false;
+    //window.cursor.visible = false;
     window.cursor.grab_mode = CursorGrabMode::Locked;
 
     //end game timer creation

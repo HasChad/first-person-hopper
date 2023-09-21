@@ -1,6 +1,7 @@
 #![allow(clippy::complexity)]
 
 use bevy::prelude::*;
+use bevy_kira_audio::prelude::*;
 
 use crate::AppState;
 
@@ -18,13 +19,15 @@ pub struct GameOverEntity;
 const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 
-pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
+pub fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
+    scores: Res<Scores>,
+) {
     info!("GameOver menu activated");
 
-    commands.spawn(AudioBundle {
-        source: asset_server.load("sounds/gameover_sound.ogg"),
-        ..default()
-    });
+    audio.play(asset_server.load("sounds/gameover_sound.ogg"));
 
     //create full screen node bundle
     commands
@@ -213,6 +216,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
 pub fn home_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<HomeButton>),
@@ -226,10 +230,7 @@ pub fn home_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds/hover_button.ogg"),
-                    ..default()
-                });
+                audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
@@ -242,6 +243,7 @@ pub fn home_button_system(
 pub fn restart_button_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<RestartButton>),
@@ -255,10 +257,7 @@ pub fn restart_button_system(
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
-                commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds/hover_button.ogg"),
-                    ..default()
-                });
+                audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();

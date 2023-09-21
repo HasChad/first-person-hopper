@@ -5,6 +5,7 @@ use bevy::{
     prelude::*,
     window::WindowMode,
 };
+use bevy_kira_audio::prelude::*;
 //use bevy_embedded_assets::EmbeddedAssetPlugin;
 
 pub mod gameover;
@@ -36,7 +37,7 @@ pub enum GameDifficultyState {
 
 fn main() {
     App::new()
-        .add_plugins(
+        .add_plugins((
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
@@ -50,7 +51,8 @@ fn main() {
                 })
                 .build(),
             //.add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetPlugin),
-        )
+            AudioPlugin,
+        ))
         .add_systems(Startup, setup)
         .add_state::<AppState>()
         .add_state::<GameDifficultyState>()
