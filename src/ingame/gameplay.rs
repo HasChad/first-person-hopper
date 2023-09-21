@@ -2,6 +2,7 @@
 
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_rapier2d::prelude::*;
+use rand::Rng;
 
 use crate::ingame::Animation;
 use crate::ingame::AnimationState;
@@ -62,14 +63,16 @@ pub fn ball_movement(
     //jump ball if collide eachother
     for _event in event_reader.iter() {
         for (mut ball_impulse, mut ball_velocity) in &mut ball {
+            let mut rng = rand::thread_rng();
+
             scores.current_score += 1;
             info!("{}", scores.current_score);
             ball_velocity.linvel.y = 0.0;
             ball_velocity.linvel.x = 0.0;
             ball_velocity.angvel = 0.0;
-            ball_impulse.impulse.y = alea::f32_in_range(500000.0, 900000.0);
-            ball_impulse.impulse.x = alea::f32_in_range(-500000.0, 500000.0);
-            ball_impulse.torque_impulse = alea::f32_in_range(-10000000.0, 10000000.0);
+            ball_impulse.impulse.y = rng.gen_range(500000.0..900000.0);
+            ball_impulse.impulse.x = rng.gen_range(-500000.0..500000.0);
+            ball_impulse.torque_impulse = rng.gen_range(-10000000.0..10000000.0);
         }
     }
 }

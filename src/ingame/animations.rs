@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use rand::Rng;
 
 use crate::ingame::Animation;
 use crate::ingame::AnimationState;
@@ -71,6 +72,8 @@ pub fn fire_spawn(
     mut m4_event_reader: EventReader<M4AnimationEvent>,
 ) {
     for _event in m4_event_reader.iter() {
+        let mut rng = rand::thread_rng();
+
         //fire effect spawner
         commands
             // Spawn a bevy sprite-sheet
@@ -118,8 +121,8 @@ pub fn fire_spawn(
             })
             .insert(RigidBody::KinematicVelocityBased)
             .insert(Velocity {
-                linvel: Vec2::new(alea::f32_in_range(4500.0, 5500.0), 1000.0),
-                angvel: alea::f32_in_range(-15.0, -5.0),
+                linvel: Vec2::new(rng.gen_range(4500.0..5500.0), 1000.0),
+                angvel: rng.gen_range(-15.0..-5.0),
             });
     }
 }
