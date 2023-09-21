@@ -1,8 +1,11 @@
+//#![windows_subsystem = "windows"]  //to disable console
+
 use bevy::{
     core_pipeline::{bloom::BloomSettings, tonemapping::Tonemapping},
     prelude::*,
     window::WindowMode,
 };
+//use bevy_embedded_assets::EmbeddedAssetPlugin;
 
 pub mod gameover;
 pub mod ingame;
@@ -46,6 +49,7 @@ fn main() {
                     ..default()
                 })
                 .build(),
+            //.add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetPlugin),
         )
         .add_systems(Startup, setup)
         .add_state::<AppState>()
