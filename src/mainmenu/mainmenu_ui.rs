@@ -59,7 +59,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                 .with_children(|parent| {
                     parent.spawn(ImageBundle {
                         image: UiImage {
-                            texture: asset_server.load("sprites\\title.png"),
+                            texture: asset_server.load("sprites/title.png"),
                             ..default()
                         },
                         ..default()
@@ -188,7 +188,7 @@ pub fn easy_button_system(
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    source: asset_server.load("sounds/hover_button.ogg"),
                     ..default()
                 });
             }
@@ -218,7 +218,7 @@ pub fn medium_button_system(
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    source: asset_server.load("sounds/hover_button.ogg"),
                     ..default()
                 });
             }
@@ -248,7 +248,7 @@ pub fn hard_button_system(
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    source: asset_server.load("sounds/hover_button.ogg"),
                     ..default()
                 });
             }

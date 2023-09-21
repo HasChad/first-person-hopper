@@ -5,6 +5,7 @@ use crate::ingame::Animation;
 use crate::ingame::AnimationState;
 use crate::ingame::ContactAnimationEvent;
 use crate::ingame::CursorCrosshair;
+use crate::ingame::InGameEntity;
 use crate::ingame::M4AnimationEvent;
 use crate::ingame::M4;
 
@@ -25,7 +26,7 @@ pub fn contact_spawn(
             // Spawn a bevy sprite-sheet
             .spawn(SpriteSheetBundle {
                 texture_atlas: textures.add(TextureAtlas::from_grid(
-                    asset_server.load("sprites\\contact_sheet.png"),
+                    asset_server.load("sprites/contact_sheet.png"),
                     Vec2::new(48.0, 48.0),
                     5,
                     1,
@@ -70,11 +71,12 @@ pub fn fire_spawn(
     mut m4_event_reader: EventReader<M4AnimationEvent>,
 ) {
     for _event in m4_event_reader.iter() {
+        //fire effect spawner
         commands
             // Spawn a bevy sprite-sheet
             .spawn(SpriteSheetBundle {
                 texture_atlas: textures.add(TextureAtlas::from_grid(
-                    asset_server.load("sprites\\fire_sheet.png"),
+                    asset_server.load("sprites/fire_sheet.png"),
                     Vec2::new(432.0, 80.0),
                     1,
                     3,
@@ -100,11 +102,13 @@ pub fn fire_spawn(
             .insert(BulletCase {
                 lifetime: Timer::from_seconds(0.2, TimerMode::Once),
             })
-            .insert(AnimationState::default());
+            .insert(AnimationState::default())
+            .insert(InGameEntity);
 
+        //bullet case spawner
         commands
             .spawn(SpriteBundle {
-                texture: asset_server.load("sprites\\bullet_case.png"),
+                texture: asset_server.load("sprites/bullet_case.png"),
                 transform: Transform::from_xyz(
                     m4_pos.single().translation.x,
                     m4_pos.single().translation.y + 200.0,
@@ -145,7 +149,7 @@ pub fn bullet_case_despawn(
         if casing_timer.lifetime.finished() {
             commands.entity(casing_entity).despawn();
             commands.spawn(AudioBundle {
-                source: asset_server.load("sounds\\casing.ogg"),
+                source: asset_server.load("sounds/casing.ogg"),
                 ..default()
             });
         }

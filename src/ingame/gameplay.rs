@@ -1,7 +1,6 @@
 #![allow(clippy::too_many_arguments)]
 
 use bevy::{prelude::*, window::CursorGrabMode};
-use bevy_cursor::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::ingame::Animation;
@@ -27,13 +26,12 @@ pub struct ContactAnimationEvent;
 pub struct M4AnimationEvent;
 
 pub fn cursor_position(
-    q_windows: Res<CursorInfo>,
     mut crosshair: Query<&mut Transform, With<CursorCrosshair>>,
     mut m4: Query<&mut Transform, (With<M4>, Without<CursorCrosshair>)>,
-    //camera_q: Query<(&Camera, &GlobalTransform)>,
-    //windows: Query<&Window>,
+    camera_q: Query<(&Camera, &GlobalTransform)>,
+    windows: Query<&Window>,
 ) {
-    /*  alternative mouse position finder
+    // alternative mouse position finder
     let (camera, camera_transform) = camera_q.single();
 
     let Some(mouse_position) = windows
@@ -42,11 +40,6 @@ pub fn cursor_position(
         .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
     else {
         return;
-    };
-    */
-
-    let Some(mouse_position) = q_windows.position() else {
-        return; //info!("out of window");
     };
 
     let mut m4_position = m4.single_mut();
@@ -105,7 +98,7 @@ pub fn ball_contact_checker(
         m4_animation_event.send(M4AnimationEvent);
         info!("{:?}", play_animation.0);
         commands.spawn(AudioBundle {
-            source: asset_server.load("sounds\\M4.ogg"),
+            source: asset_server.load("sounds/M4.ogg"),
             ..default()
         });
 

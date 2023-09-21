@@ -37,7 +37,7 @@ pub fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServe
     //normal jump-ball spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\easy_ball.png"),
+            texture: asset_server.load("sprites/easy_ball.png"),
             sprite: Sprite {
                 color: Color::rgb(0.40, 1.5, 0.8),
                 ..default()
@@ -75,7 +75,7 @@ pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetSer
     //normal jump-ball spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\medium_ball.png"),
+            texture: asset_server.load("sprites/medium_ball.png"),
             sprite: Sprite {
                 color: Color::rgb(0.7, 1.4, 1.8),
                 ..default()
@@ -113,7 +113,7 @@ pub fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServe
     //normal jump-ball spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\hard_ball.png"),
+            texture: asset_server.load("sprites/hard_ball.png"),
             sprite: Sprite {
                 color: Color::rgb(1.8, 0.40, 0.40),
                 ..default()
@@ -157,7 +157,7 @@ pub fn setup(
     scores.current_score = 0;
 
     commands.spawn(AudioBundle {
-        source: asset_server.load("sounds\\start.ogg"),
+        source: asset_server.load("sounds/start.ogg"),
         ..default()
     });
 
@@ -176,7 +176,7 @@ pub fn setup(
     //background spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\background.png"),
+            texture: asset_server.load("sprites/background.png"),
             transform: Transform::from_xyz(0.0, 0.0, -9.0),
             ..default()
         })
@@ -187,7 +187,7 @@ pub fn setup(
         // Spawn a bevy sprite-sheet
         .spawn(SpriteSheetBundle {
             texture_atlas: textures.add(TextureAtlas::from_grid(
-                asset_server.load("sprites\\m4_sheet.png"),
+                asset_server.load("sprites/m4_sheet.png"),
                 Vec2::new(1550.0, 720.0),
                 5,
                 1,
@@ -213,7 +213,7 @@ pub fn setup(
     //crosshair and collision spawn
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\crosshair.png"),
+            texture: asset_server.load("sprites/crosshair.png"),
             sprite: Sprite {
                 color: Color::rgb(1.0, 1.0, 1.0),
                 ..default()
@@ -231,7 +231,7 @@ pub fn setup(
     //right wall
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\wall.png"),
+            texture: asset_server.load("sprites/wall.png"),
             sprite: Sprite {
                 color: Color::rgba(5.0, 5.0, 5.0, 0.1),
                 flip_x: true,
@@ -254,7 +254,7 @@ pub fn setup(
     //left wall
     commands
         .spawn(SpriteBundle {
-            texture: asset_server.load("sprites\\wall.png"),
+            texture: asset_server.load("sprites/wall.png"),
             sprite: Sprite {
                 color: Color::rgba(5.0, 5.0, 5.0, 0.1),
                 ..default()

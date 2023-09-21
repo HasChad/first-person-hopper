@@ -22,7 +22,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
     info!("GameOver menu activated");
 
     commands.spawn(AudioBundle {
-        source: asset_server.load("sounds\\gameover_sound.ogg"),
+        source: asset_server.load("sounds/gameover_sound.ogg"),
         ..default()
     });
 
@@ -227,7 +227,7 @@ pub fn home_button_system(
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    source: asset_server.load("sounds/hover_button.ogg"),
                     ..default()
                 });
             }
@@ -256,7 +256,7 @@ pub fn restart_button_system(
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 commands.spawn(AudioBundle {
-                    source: asset_server.load("sounds\\hover_button.ogg"),
+                    source: asset_server.load("sounds/hover_button.ogg"),
                     ..default()
                 });
             }

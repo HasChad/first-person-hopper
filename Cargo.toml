@@ -2,7 +2,7 @@
 name = "bevy-2d-fps"
 version = "0.1.0"
 edition = "2021"
-author = "HasChad"
+authors = ["HasChad"]
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
@@ -15,7 +15,6 @@ opt-level = 3
 [dependencies]
 bevy = "0.11.2"
 bevy_rapier2d = "0.22.0"
-bevy_cursor = "0.1.1"
 bevy_embedded_assets = "0.8.0"
 benimator = "4.1.3"
 alea = "0.2.2"

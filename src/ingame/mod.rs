@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_cursor::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 pub mod animations;
@@ -38,7 +37,6 @@ impl Plugin for InGamePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1.0))
             // ! .add_plugins(RapierDebugRenderPlugin::default())
-            .add_plugins(CursorInfoPlugin)
             .add_event::<JumpBallEvent>()
             .add_event::<ContactAnimationEvent>()
             .add_event::<M4AnimationEvent>()

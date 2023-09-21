@@ -319,7 +319,6 @@ dependencies = [
  "alea",
  "benimator",
  "bevy",
- "bevy_cursor",
  "bevy_embedded_assets",
  "bevy_rapier2d",
 ]
@@ -454,16 +453,6 @@ dependencies = [
  "bitflags 2.4.0",
  "radsort",
  "serde",
-]
-
-[[package]]
-name = "bevy_cursor"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8211b91fd9f6dbf777fd86637e4d96026a235e8a91de7a72f4b690a46296afb"
-dependencies = [
- "bevy",
- "smallvec",
 ]
 
 [[package]]

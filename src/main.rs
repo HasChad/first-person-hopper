@@ -74,7 +74,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         BloomSettings::default(), // 3. Enable bloom for the camera
     ));
     commands.spawn(SpriteBundle {
-        texture: asset_server.load("sprites\\menu_background.png"),
+        texture: asset_server.load("sprites/menu_background.png"),
         transform: Transform::from_xyz(0.0, 0.0, -10.0),
         ..default()
     });
