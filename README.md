@@ -4,3 +4,5 @@
 
 Game inspired from LONEWOLF - "Kick Ups Pistol" game mode
 M4 inspired from CoD: MW2
+
+https://haschad.itch.io/first-person-hopper
