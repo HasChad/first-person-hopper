@@ -1,12 +1,14 @@
-//#![windows_subsystem = "windows"]  //to disable console
+#![windows_subsystem = "windows"] //to disable console
 
 use bevy::{
     core_pipeline::{bloom::BloomSettings, tonemapping::Tonemapping},
     prelude::*,
-    window::WindowMode,
+    window::{PrimaryWindow, WindowMode},
+    winit::WinitWindows,
 };
+use bevy_embedded_assets::EmbeddedAssetPlugin;
 use bevy_kira_audio::prelude::*;
-//use bevy_embedded_assets::EmbeddedAssetPlugin;
+use winit::window::Icon;
 
 pub mod gameover;
 pub mod ingame;
@@ -49,11 +51,11 @@ fn main() {
                     }),
                     ..default()
                 })
-                .build(),
-            //.add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetPlugin),
+                .build()
+                .add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetPlugin),
             AudioPlugin,
         ))
-        .add_systems(Startup, setup)
+        .add_systems(Startup, (setup, setup_window))
         .add_state::<AppState>()
         .add_state::<GameDifficultyState>()
         .add_plugins(InGamePlugin)
@@ -80,4 +82,27 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         transform: Transform::from_xyz(0.0, 0.0, -10.0),
         ..default()
     });
+}
+
+pub fn setup_window(
+    windows: NonSend<WinitWindows>,
+    primary_window_query: Query<Entity, With<PrimaryWindow>>,
+) {
+    let primary_window_entity = primary_window_query.single();
+    let primary_window = windows.get_window(primary_window_entity).unwrap();
+
+    // here we use the `image` crate to load our icon data from a png file
+    // this is not a very bevy-native solution, but it will do
+    let (icon_rgba, icon_width, icon_height) = {
+        let image = image::open("assets/icons/game_icon.png")
+            .expect("Failed to open icon path")
+            .into_rgba8();
+        let (width, height) = image.dimensions();
+        let rgba = image.into_raw();
+        (rgba, width, height)
+    };
+
+    let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
+
+    primary_window.set_window_icon(Some(icon));
 }

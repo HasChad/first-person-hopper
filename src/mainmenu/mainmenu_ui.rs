@@ -23,6 +23,27 @@ const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
+    //version text
+    commands
+        .spawn(
+            TextBundle::from_section(
+                "v1.1",
+                TextStyle {
+                    font: asset_server.load("fonts/NotoSans-Medium.ttf"),
+                    font_size: 25.0,
+                    color: Color::WHITE,
+                },
+            )
+            // Set the style of the TextBundle itself.
+            .with_style(Style {
+                position_type: PositionType::Absolute,
+                bottom: Val::Px(10.0),
+                right: Val::Px(10.0),
+                ..default()
+            }),
+        )
+        .insert(MainMenuEntity);
+
     //spawn full screen node bundle
     commands
         .spawn(NodeBundle {
