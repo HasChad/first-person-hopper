@@ -43,7 +43,7 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Bevy 2D FPS".into(),
+                        title: "First Person Hopper".into(),
                         resolution: (SCREEN_WIDTH, SCREEN_HEIGHT).into(),
                         resizable: false,
                         mode: WindowMode::Windowed,

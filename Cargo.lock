@@ -319,21 +319,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy-2d-fps"
-version = "0.1.1"
-dependencies = [
- "benimator",
- "bevy",
- "bevy_embedded_assets",
- "bevy_kira_audio",
- "bevy_rapier2d",
- "image",
- "rand",
- "winit",
- "winres",
-]
-
-[[package]]
 name = "bevy_a11y"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1646,6 +1631,21 @@ dependencies = [
  "libc",
  "redox_syscall",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "first-person-hopper"
+version = "0.1.1"
+dependencies = [
+ "benimator",
+ "bevy",
+ "bevy_embedded_assets",
+ "bevy_kira_audio",
+ "bevy_rapier2d",
+ "image",
+ "rand",
+ "winit",
+ "winres",
 ]
 
 [[package]]
