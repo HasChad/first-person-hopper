@@ -1,4 +1,4 @@
-# bevy-2d-fps
+# First Person Hopper
 
 2D FPS game made with Bevy engine using rust programming language
 
