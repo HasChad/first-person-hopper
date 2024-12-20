@@ -10,6 +10,7 @@ use gameplay::*;
 use ingame_ui::*;
 use spawn::*;
 
+use crate::despawn_screen;
 use crate::GameDifficultyState;
 use crate::GameState;
 
@@ -50,6 +51,7 @@ impl Plugin for InGamePlugin {
             )
                 .run_if(in_state(GameState::InGame)),
         )
+        .add_systems(OnExit(GameState::InGame), despawn_screen::<InGameEntity>)
         .add_event::<HitEvent>()
         .add_event::<ShootingEvent>()
         .insert_resource(PlayAnimation(false))

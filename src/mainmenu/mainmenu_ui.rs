@@ -1,7 +1,10 @@
-use bevy::prelude::*;
+use bevy::{ecs::system::RunSystemOnce, prelude::*};
 use bevy_kira_audio::prelude::*;
 
-use crate::{ingame::Scores, GameDifficultyState, GameState, CUSTOM_FONT};
+use crate::{ingame::Scores, DespawnEvent, GameDifficultyState, GameState, CUSTOM_FONT};
+
+#[derive(Component)]
+pub struct MainMenuEntity;
 
 #[derive(Component)]
 pub struct EasyButton;
@@ -12,6 +15,7 @@ pub struct MediumButton;
 #[derive(Component)]
 pub struct HardButton;
 
+const PRESSED_BUTTON: Color = Color::WHITE;
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 
@@ -35,20 +39,24 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
 
     //spawn full screen node bundle
     commands
-        .spawn(Node {
-            height: Val::Percent(100.0),
-            width: Val::Percent(100.0),
-            flex_direction: FlexDirection::Column,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
-            ..default()
-        })
+        .spawn((
+            Node {
+                height: Val::Percent(100.0),
+                width: Val::Percent(100.0),
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+            MainMenuEntity,
+        ))
         //title node bundle
         .with_child((
             Sprite::from_image(asset_server.load("sprites/title.png")),
             Node {
-                height: Val::Percent(30.0),
+                height: Val::Percent(50.0),
                 width: Val::Percent(100.0),
+                flex_direction: FlexDirection::Row,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
 
@@ -64,11 +72,12 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     flex_direction: FlexDirection::Row,
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::Center,
-                    column_gap: Val::Px(75.0),
+                    column_gap: Val::Px(50.0),
                     ..default()
                 })
                 //spawn easy button
                 .with_children(|parent| {
+                    //spawn easy button
                     parent
                         .spawn((
                             Button,
@@ -89,7 +98,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             Text::new(format!("EASY: {}", scores.easy_hscore)),
                             TextFont {
                                 font: asset_server.load(CUSTOM_FONT),
-                                font_size: 40.0,
+                                font_size: 30.0,
                                 ..default()
                             },
                             TextColor(Color::srgb(0.19, 0.76, 0.41)),
@@ -116,7 +125,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             Text::new(format!("MEDIUM: {}", scores.medium_hscore)),
                             TextFont {
                                 font: asset_server.load(CUSTOM_FONT),
-                                font_size: 40.0,
+                                font_size: 30.0,
                                 ..default()
                             },
                             TextColor(Color::srgb(0.35, 0.67, 0.89)),
@@ -143,7 +152,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             Text::new(format!("HARD: {}", scores.hard_hscore)),
                             TextFont {
                                 font: asset_server.load(CUSTOM_FONT),
-                                font_size: 40.0,
+                                font_size: 30.0,
                                 ..default()
                             },
                             TextColor(Color::srgb(0.88, 0.21, 0.20)),
@@ -164,18 +173,20 @@ pub fn easy_button_system(
 ) {
     for (interaction, mut color, mut border_color) in &mut interaction_query {
         match *interaction {
-            Interaction::Pressed => {
-                next_game_state.set(GameState::InGame);
-                next_difficulty_state.set(GameDifficultyState::Easy);
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+                border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
-            Interaction::None => {
-                *color = NORMAL_BUTTON.into();
+            Interaction::Pressed => {
+                *color = PRESSED_BUTTON.into();
                 border_color.0 = Color::BLACK;
+                next_game_state.set(GameState::InGame);
+                next_difficulty_state.set(GameDifficultyState::Easy);
             }
         }
     }
@@ -193,18 +204,20 @@ pub fn medium_button_system(
 ) {
     for (interaction, mut color, mut border_color) in &mut interaction_query {
         match *interaction {
-            Interaction::Pressed => {
-                next_game_state.set(GameState::InGame);
-                next_difficulty_state.set(GameDifficultyState::Medium);
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+                border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
-            Interaction::None => {
-                *color = NORMAL_BUTTON.into();
+            Interaction::Pressed => {
+                *color = PRESSED_BUTTON.into();
                 border_color.0 = Color::BLACK;
+                next_game_state.set(GameState::InGame);
+                next_difficulty_state.set(GameDifficultyState::Medium);
             }
         }
     }
@@ -222,18 +235,20 @@ pub fn hard_button_system(
 ) {
     for (interaction, mut color, mut border_color) in &mut interaction_query {
         match *interaction {
-            Interaction::Pressed => {
-                next_game_state.set(GameState::InGame);
-                next_difficulty_state.set(GameDifficultyState::Hard);
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+                border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
-            Interaction::None => {
-                *color = NORMAL_BUTTON.into();
+            Interaction::Pressed => {
+                *color = PRESSED_BUTTON.into();
                 border_color.0 = Color::BLACK;
+                next_game_state.set(GameState::InGame);
+                next_difficulty_state.set(GameDifficultyState::Hard);
             }
         }
     }

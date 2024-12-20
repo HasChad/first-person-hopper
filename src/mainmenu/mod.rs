@@ -4,7 +4,7 @@ mod mainmenu_ui;
 
 use mainmenu_ui::*;
 
-use crate::GameState;
+use crate::{despawn_screen, GameState};
 
 pub struct MainMenuPlugin;
 
@@ -14,6 +14,10 @@ impl Plugin for MainMenuPlugin {
             .add_systems(
                 Update,
                 (easy_button_system, medium_button_system, hard_button_system),
+            )
+            .add_systems(
+                OnExit(GameState::MainMenu),
+                despawn_screen::<MainMenuEntity>,
             );
     }
 }

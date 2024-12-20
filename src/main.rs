@@ -12,6 +12,9 @@ use gameover::GameOverPlugin;
 use ingame::InGamePlugin;
 use mainmenu::MainMenuPlugin;
 
+#[derive(Event)]
+pub struct DespawnEvent;
+
 pub const SCREEN_WIDTH: f32 = 1280.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
 pub const CUSTOM_FONT: &str = "fonts/NotoSans-Medium.ttf";
@@ -51,7 +54,7 @@ fn main() {
         )
         .add_plugins(AudioPlugin)
         .add_plugins(PhysicsPlugins::default())
-        //.add_plugins(PhysicsDebugPlugin::default())
+        .add_plugins(PhysicsDebugPlugin::default())
         //systems
         .add_systems(Startup, setup)
         //states
@@ -74,11 +77,9 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-pub fn entity_despawner(
-    mut commands: Commands,
-    mut entity_query: Query<Entity, Without<Camera2d>>,
-) {
-    for entity in &mut entity_query {
+// Generic system that takes a component as a parameter, and will despawn all entities with that component
+fn despawn_screen<T: Component>(to_despawn: Query<Entity, With<T>>, mut commands: Commands) {
+    for entity in &to_despawn {
         commands.entity(entity).despawn_recursive();
     }
 }

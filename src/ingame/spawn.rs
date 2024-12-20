@@ -6,6 +6,9 @@ use super::Scores;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
 #[derive(Component)]
+pub struct InGameEntity;
+
+#[derive(Component)]
 pub struct CursorCrosshair;
 
 #[derive(Component)]
@@ -49,14 +52,18 @@ pub fn setup(
     window.cursor_options.grab_mode = CursorGrabMode::Confined;
 
     //end game timer creation
-    commands.spawn(EndGameTimer {
-        lifetime: Timer::from_seconds(0.5, TimerMode::Once),
-    });
+    commands.spawn((
+        EndGameTimer {
+            lifetime: Timer::from_seconds(0.5, TimerMode::Once),
+        },
+        InGameEntity,
+    ));
 
     //background spawn
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/background.png")),
         Transform::from_xyz(0.0, 0.0, -9.0),
+        InGameEntity,
     ));
 
     //spawn m4 with animation props
@@ -78,6 +85,7 @@ pub fn setup(
                 lifetime: Timer::from_seconds(0.2, TimerMode::Once),
                 okay_to_shoot: true,
             },
+            InGameEntity,
         ));
 
     //crosshair and collision spawn
@@ -86,6 +94,7 @@ pub fn setup(
         Collider::circle(5.0),
         Sensor,
         CursorCrosshair,
+        InGameEntity,
     ));
 
     //right wall
@@ -94,6 +103,7 @@ pub fn setup(
         Transform::from_xyz(SCREEN_WIDTH / 2.0, 0.0, -6.0),
         Friction::new(0.0).with_combine_rule(CoefficientCombine::Min),
         Collider::rectangle(100.0, SCREEN_HEIGHT / 2.0 + 500.0),
+        InGameEntity,
     ));
 
     //left wall
@@ -102,6 +112,7 @@ pub fn setup(
         Transform::from_xyz(-SCREEN_WIDTH / 2.0, 0.0, -6.0),
         Friction::new(0.0).with_combine_rule(CoefficientCombine::Min),
         Collider::rectangle(100.0, SCREEN_HEIGHT / 2.0 + 500.0),
+        InGameEntity,
     ));
 }
 
@@ -123,6 +134,7 @@ pub fn game_difficulty_easy(mut commands: Commands, asset_server: Res<AssetServe
         ExternalImpulse::default(),
         ExternalTorque::default(),
         Ball::Easy,
+        InGameEntity,
     ));
 }
 
@@ -144,6 +156,7 @@ pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetSer
         AngularVelocity::default(),
         ExternalTorque::default(),
         Ball::Medium,
+        InGameEntity,
     ));
 }
 
@@ -165,5 +178,6 @@ pub fn game_difficulty_hard(mut commands: Commands, asset_server: Res<AssetServe
         AngularVelocity::default(),
         ExternalTorque::default(),
         Ball::Hard,
+        InGameEntity,
     ));
 }

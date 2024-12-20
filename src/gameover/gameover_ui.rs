@@ -4,11 +4,15 @@ use bevy_kira_audio::prelude::*;
 use crate::{ingame::Scores, GameState, CUSTOM_FONT};
 
 #[derive(Component)]
+pub struct GameOverEntity;
+
+#[derive(Component)]
 pub struct HomeButton;
 
 #[derive(Component)]
 pub struct RestartButton;
 
+const PRESSED_BUTTON: Color = Color::WHITE;
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 
@@ -22,15 +26,18 @@ pub fn setup(
 
     //create full screen node bundle
     commands
-        .spawn(Node {
-            height: Val::Percent(100.0),
-            width: Val::Percent(100.0),
-            flex_direction: FlexDirection::Column,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
-            column_gap: Val::Px(100.0),
-            ..default()
-        })
+        .spawn((
+            Node {
+                height: Val::Percent(100.0),
+                width: Val::Percent(100.0),
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                column_gap: Val::Px(100.0),
+                ..default()
+            },
+            GameOverEntity,
+        ))
         //create upper "game over" title node bundle
         .with_children(|parent| {
             parent
@@ -111,56 +118,68 @@ pub fn setup(
                     column_gap: Val::Px(100.0),
                     ..default()
                 })
-                // main menu button
-                .with_child((
-                    Text::new("MAIN MENU"),
-                    TextFont {
-                        font: asset_server.load(CUSTOM_FONT),
-                        font_size: 40.0,
-                        ..default()
-                    },
-                    TextColor(Color::srgb(0.9, 0.9, 0.9)),
-                    Node {
-                        width: Val::Px(200.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    BorderColor(Color::BLACK),
-                    BackgroundColor(NORMAL_BUTTON),
-                    HomeButton,
-                ))
-                // restart button
-                .with_child((
-                    Text::new("RESTART"),
-                    TextFont {
-                        font: asset_server.load(CUSTOM_FONT),
-                        font_size: 40.0,
-                        ..default()
-                    },
-                    TextColor(Color::srgb(0.9, 0.9, 0.9)),
-                    Node {
-                        width: Val::Px(200.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    BorderColor(Color::BLACK),
-                    BackgroundColor(NORMAL_BUTTON),
-                    RestartButton,
-                ));
+                .with_children(|parent| {
+                    //spawn main menu button
+                    parent
+                        .spawn((
+                            Button,
+                            Node {
+                                width: Val::Px(220.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            BorderColor(Color::BLACK),
+                            BorderRadius::MAX,
+                            BackgroundColor(NORMAL_BUTTON),
+                            HomeButton,
+                        ))
+                        .with_child((
+                            Text::new("MAIN MENU"),
+                            TextFont {
+                                font: asset_server.load(CUSTOM_FONT),
+                                font_size: 30.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+
+                    // restart button
+                    parent
+                        .spawn((
+                            Button,
+                            Node {
+                                width: Val::Px(220.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            BorderColor(Color::BLACK),
+                            BorderRadius::MAX,
+                            BackgroundColor(NORMAL_BUTTON),
+                            RestartButton,
+                        ))
+                        .with_child((
+                            Text::new("RESTART"),
+                            TextFont {
+                                font: asset_server.load(CUSTOM_FONT),
+                                font_size: 30.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+                });
         });
 }
 
 pub fn home_button_system(
+    mut next_gamestate: ResMut<NextState<GameState>>,
     asset_server: Res<AssetServer>,
     audio: Res<Audio>,
-    mut next_gamestate: ResMut<NextState<GameState>>,
-
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<HomeButton>),
@@ -168,27 +187,28 @@ pub fn home_button_system(
 ) {
     for (interaction, mut color, mut border_color) in &mut interaction_query {
         match *interaction {
-            Interaction::Pressed => {
-                next_gamestate.set(GameState::MainMenu);
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+                border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
-            Interaction::None => {
-                *color = NORMAL_BUTTON.into();
+            Interaction::Pressed => {
+                *color = PRESSED_BUTTON.into();
                 border_color.0 = Color::BLACK;
+                next_gamestate.set(GameState::MainMenu);
             }
         }
     }
 }
 
 pub fn restart_button_system(
+    mut next_gamestate: ResMut<NextState<GameState>>,
     asset_server: Res<AssetServer>,
     audio: Res<Audio>,
-    mut next_gamestate: ResMut<NextState<GameState>>,
-
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
         (Changed<Interaction>, With<RestartButton>),
@@ -196,17 +216,19 @@ pub fn restart_button_system(
 ) {
     for (interaction, mut color, mut border_color) in &mut interaction_query {
         match *interaction {
-            Interaction::Pressed => {
-                next_gamestate.set(GameState::InGame);
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+                border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
                 border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
-            Interaction::None => {
-                *color = NORMAL_BUTTON.into();
+            Interaction::Pressed => {
+                *color = PRESSED_BUTTON.into();
                 border_color.0 = Color::BLACK;
+                next_gamestate.set(GameState::InGame);
             }
         }
     }
