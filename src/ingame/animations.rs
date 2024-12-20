@@ -1,14 +1,11 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
-use bevy_rapier2d::prelude::*;
 use rand::Rng;
 
-use crate::ingame::Animation;
-use crate::ingame::AnimationState;
-use crate::ingame::ContactAnimationEvent;
 use crate::ingame::CursorCrosshair;
-use crate::ingame::InGameEntity;
-use crate::ingame::M4AnimationEvent;
+use crate::ingame::HitEvent;
 use crate::ingame::M4;
 
 #[derive(Component)]
@@ -16,54 +13,77 @@ pub struct BulletCase {
     lifetime: Timer,
 }
 
+#[derive(Component)]
+pub struct AnimationConfig {
+    first_sprite_index: usize,
+    last_sprite_index: usize,
+    fps: u8,
+    frame_timer: Timer,
+}
+
+impl AnimationConfig {
+    fn new(first: usize, last: usize, fps: u8) -> Self {
+        Self {
+            first_sprite_index: first,
+            last_sprite_index: last,
+            fps,
+            frame_timer: Self::timer_from_fps(fps),
+        }
+    }
+
+    fn timer_from_fps(fps: u8) -> Timer {
+        Timer::new(Duration::from_secs_f32(1.0 / (fps as f32)), TimerMode::Once)
+    }
+}
+
+pub fn sprite_animator(time: Res<Time>, mut query: Query<(&mut AnimationConfig, &mut Sprite)>) {
+    for (mut config, mut sprite) in &mut query {
+        config.frame_timer.tick(time.delta());
+
+        if config.frame_timer.just_finished() {
+            if let Some(atlas) = &mut sprite.texture_atlas {
+                if atlas.index == config.last_sprite_index {
+                    atlas.index = config.first_sprite_index;
+                } else {
+                    atlas.index += 1;
+                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                }
+            }
+        }
+    }
+}
+
 pub fn contact_spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut textures: ResMut<Assets<TextureAtlas>>,
-    mut contact_event_reader: EventReader<ContactAnimationEvent>,
+    mut contact_event_reader: EventReader<HitEvent>,
     cursor_pos: Query<&Transform, With<CursorCrosshair>>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    for _event in contact_event_reader.iter() {
-        commands
-            // Spawn a bevy sprite-sheet
-            .spawn(SpriteSheetBundle {
-                texture_atlas: textures.add(TextureAtlas::from_grid(
-                    asset_server.load("sprites/contact_sheet.png"),
-                    Vec2::new(48.0, 48.0),
-                    5,
-                    1,
-                    None,
-                    None,
-                )),
-                transform: Transform::from_xyz(
-                    cursor_pos.single().translation.x,
-                    cursor_pos.single().translation.y,
-                    -2.0,
-                ),
+    for _event in contact_event_reader.read() {
+        let layout = TextureAtlasLayout::from_grid(UVec2::splat(48), 5, 1, None, None);
+        let texture_atlas_layout = texture_atlas_layouts.add(layout);
+        let animation_config_1 = AnimationConfig::new(1, 6, 10);
+
+        commands.spawn((
+            Sprite {
+                image: asset_server.load("sprites/contact_sheet.png"),
+                texture_atlas: Some(TextureAtlas {
+                    layout: texture_atlas_layout,
+                    index: animation_config_1.first_sprite_index,
+                }),
                 ..default()
-            })
-            //Create and insert an animation
-            .insert(Animation(benimator::Animation::once(
-                benimator::Animation::from_indices(0..=4, benimator::FrameRate::from_fps(16.0)),
-            )))
-            // Insert the state
-            .insert(AnimationState::default());
+            },
+            Transform::from_xyz(
+                cursor_pos.single().translation.x,
+                cursor_pos.single().translation.y,
+                -2.0,
+            ),
+        ));
     }
 }
 
-pub fn contact_animation(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), Without<M4>>,
-) {
-    for (mut anim_state, mut texture, animation) in query.iter_mut() {
-        // Update the state
-        anim_state.update(animation, time.delta());
-
-        // Update the texture atlas
-        texture.index = anim_state.frame_index();
-    }
-}
-
+/*
 pub fn fire_spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -128,18 +148,7 @@ pub fn fire_spawn(
     }
 }
 
-pub fn fire_animation(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationState, &mut TextureAtlasSprite, &Animation), With<BulletCase>>,
-) {
-    for (mut anim_state, mut texture, animation) in query.iter_mut() {
-        // Update the state
-        anim_state.update(animation, time.delta());
 
-        // Update the texture atlas
-        texture.index = anim_state.frame_index();
-    }
-}
 
 pub fn bullet_case_despawn(
     mut commands: Commands,
@@ -157,3 +166,5 @@ pub fn bullet_case_despawn(
         }
     }
 }
+
+*/

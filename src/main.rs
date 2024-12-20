@@ -1,12 +1,9 @@
-#![windows_subsystem = "windows"] //to disable console
+// #![windows_subsystem = "windows"] //to disable console
 
-use bevy::{
-    core_pipeline::{bloom::BloomSettings, tonemapping::Tonemapping},
-    prelude::*,
-    window::WindowMode,
-};
-use bevy_embedded_assets::EmbeddedAssetPlugin;
+use avian2d::prelude::*;
+use bevy::{prelude::*, window::WindowMode};
 use bevy_kira_audio::prelude::*;
+
 pub mod gameover;
 pub mod ingame;
 pub mod mainmenu;
@@ -17,9 +14,10 @@ use mainmenu::MainMenuPlugin;
 
 pub const SCREEN_WIDTH: f32 = 1280.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
+pub const CUSTOM_FONT: &str = "fonts/NotoSans-Medium.ttf";
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-pub enum AppState {
+pub enum GameState {
     #[default]
     MainMenu,
     InGame,
@@ -28,15 +26,16 @@ pub enum AppState {
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 pub enum GameDifficultyState {
-    Easy,
     #[default]
+    Easy,
     Medium,
     Hard,
 }
 
 fn main() {
     App::new()
-        .add_plugins((
+        //plugins
+        .add_plugins(
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
@@ -48,13 +47,17 @@ fn main() {
                     }),
                     ..default()
                 })
-                .build()
-                .add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetPlugin),
-            AudioPlugin,
-        ))
+                .build(),
+        )
+        .add_plugins(AudioPlugin)
+        .add_plugins(PhysicsPlugins::default())
+        //.add_plugins(PhysicsDebugPlugin::default())
+        //systems
         .add_systems(Startup, setup)
-        .add_state::<AppState>()
-        .add_state::<GameDifficultyState>()
+        //states
+        .init_state::<GameState>()
+        .init_state::<GameDifficultyState>()
+        //mod plugins
         .add_plugins(InGamePlugin)
         .add_plugins(MainMenuPlugin)
         .add_plugins(GameOverPlugin)
@@ -63,20 +66,19 @@ fn main() {
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     //setup camera with debug-render.
+    commands.spawn(Camera2d);
+
     commands.spawn((
-        Camera2dBundle {
-            camera: Camera {
-                hdr: true, // 1. HDR is required for bloom
-                ..default()
-            },
-            tonemapping: Tonemapping::TonyMcMapface, // 2. Using a tonemapper that desaturates to white is recommended
-            ..default()
-        },
-        BloomSettings::default(), // 3. Enable bloom for the camera
+        Sprite::from_image(asset_server.load("sprites/menu_background.png")),
+        Transform::from_xyz(0.0, 0.0, -10.0),
     ));
-    commands.spawn(SpriteBundle {
-        texture: asset_server.load("sprites/menu_background.png"),
-        transform: Transform::from_xyz(0.0, 0.0, -10.0),
-        ..default()
-    });
+}
+
+pub fn entity_despawner(
+    mut commands: Commands,
+    mut entity_query: Query<Entity, Without<Camera2d>>,
+) {
+    for entity in &mut entity_query {
+        commands.entity(entity).despawn_recursive();
+    }
 }
