@@ -38,7 +38,7 @@ bevy = { version = "0.15.0", default-features = false, features = [
     "dynamic_linking", # Dynamic linking for faster compile-times
 ] }
 bevy_kira_audio = "0.21.0"
-avian2d = { git = "https://github.com/Jondolf/avian", branch = "main" }
+avian2d = "0.2.0"
 rand = "0.8.5"
 
 [build-dependencies]

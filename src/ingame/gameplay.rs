@@ -1,15 +1,12 @@
 #![allow(clippy::too_many_arguments)]
 
 use avian2d::prelude::*;
-use bevy::{prelude::*, ui::RelativeCursorPosition, window::CursorGrabMode};
+use bevy::{prelude::*, utils::info, window::CursorGrabMode};
 use bevy_kira_audio::prelude::*;
 use rand::Rng;
 
 use super::{Ball, CursorCrosshair, EndGameTimer, Scores, M4};
 use crate::{GameDifficultyState, GameState};
-
-#[derive(Resource)]
-pub struct PlayAnimation(pub bool);
 
 #[derive(Event)]
 pub struct ShootingEvent;
@@ -18,17 +15,28 @@ pub struct ShootingEvent;
 pub struct HitEvent;
 
 pub fn cursor_position(
-    cursor_pos_query: Single<&RelativeCursorPosition>,
     mut crosshair_pos: Single<&mut Transform, With<CursorCrosshair>>,
     mut m4_pos: Single<&mut Transform, (With<M4>, Without<CursorCrosshair>)>,
+    camera_query: Single<(&Camera, &GlobalTransform)>,
+    windows: Query<&Window>,
 ) {
-    if let Some(cursor_pos) = cursor_pos_query.normalized {
-        crosshair_pos.translation.x = cursor_pos.x;
-        crosshair_pos.translation.y = cursor_pos.y;
+    let (camera, camera_transform) = *camera_query;
 
-        m4_pos.translation.x = cursor_pos.x + 350.0;
-        m4_pos.translation.y = cursor_pos.y - 400.0;
-    }
+    let window = windows.single();
+
+    let Some(cursor_position) = window.cursor_position() else {
+        return;
+    };
+
+    let Ok(cursor_pos) = camera.viewport_to_world_2d(camera_transform, cursor_position) else {
+        return;
+    };
+
+    crosshair_pos.translation.x = cursor_pos.x;
+    crosshair_pos.translation.y = cursor_pos.y;
+
+    m4_pos.translation.x = cursor_pos.x + 350.0;
+    m4_pos.translation.y = cursor_pos.y - 400.0;
 }
 
 pub fn ball_contact_checker(
@@ -38,7 +46,6 @@ pub fn ball_contact_checker(
     mouse_input: Res<ButtonInput<MouseButton>>,
     crosshair: Query<Entity, With<CursorCrosshair>>,
     mut m4: Query<&mut M4>,
-    mut play_animation: ResMut<PlayAnimation>,
     mut hit_event_writer: EventWriter<HitEvent>,
     mut shooting_event_writer: EventWriter<ShootingEvent>,
     mut collision_event_reader: EventReader<Collision>,
@@ -49,13 +56,15 @@ pub fn ball_contact_checker(
 
     if mouse_input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
         m4_props.okay_to_shoot = false;
-        play_animation.0 = true;
-        hit_event_writer.send(HitEvent);
+        shooting_event_writer.send(ShootingEvent);
+
         audio.play(asset_server.load("sounds/M4.ogg"));
 
         for Collision(contacts) in collision_event_reader.read() {
             if contacts.entity1 == ball_entity && contacts.entity2 == cross_entity {
-                shooting_event_writer.send(ShootingEvent);
+                hit_event_writer.send(HitEvent);
+
+                info("nice");
             }
         }
     }

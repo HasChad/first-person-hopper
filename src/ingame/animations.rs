@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy::state::commands;
 use bevy_kira_audio::prelude::*;
 use rand::Rng;
 
@@ -14,15 +15,18 @@ pub struct BulletCase {
 }
 
 #[derive(Component)]
+pub struct ContactSprite;
+
+#[derive(Component)]
 pub struct AnimationConfig {
-    first_sprite_index: usize,
-    last_sprite_index: usize,
-    fps: u8,
+    pub first_sprite_index: usize,
+    pub last_sprite_index: usize,
+    pub fps: u8,
     frame_timer: Timer,
 }
 
 impl AnimationConfig {
-    fn new(first: usize, last: usize, fps: u8) -> Self {
+    pub fn new(first: usize, last: usize, fps: u8) -> Self {
         Self {
             first_sprite_index: first,
             last_sprite_index: last,
@@ -36,7 +40,10 @@ impl AnimationConfig {
     }
 }
 
-pub fn sprite_animator(time: Res<Time>, mut query: Query<(&mut AnimationConfig, &mut Sprite)>) {
+pub fn m4_sprite_animator(
+    time: Res<Time>,
+    mut query: Query<(&mut AnimationConfig, &mut Sprite), With<M4>>,
+) {
     for (mut config, mut sprite) in &mut query {
         config.frame_timer.tick(time.delta());
 
@@ -44,6 +51,27 @@ pub fn sprite_animator(time: Res<Time>, mut query: Query<(&mut AnimationConfig, 
             if let Some(atlas) = &mut sprite.texture_atlas {
                 if atlas.index == config.last_sprite_index {
                     atlas.index = config.first_sprite_index;
+                } else {
+                    atlas.index += 1;
+                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                }
+            }
+        }
+    }
+}
+
+pub fn contact_sprite_animator(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut AnimationConfig, &mut Sprite), With<ContactSprite>>,
+) {
+    for (entity, mut config, mut sprite) in &mut query {
+        config.frame_timer.tick(time.delta());
+
+        if config.frame_timer.just_finished() {
+            if let Some(atlas) = &mut sprite.texture_atlas {
+                if atlas.index == config.last_sprite_index {
+                    commands.entity(entity).despawn_recursive();
                 } else {
                     atlas.index += 1;
                     config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
@@ -63,14 +91,14 @@ pub fn contact_spawn(
     for _event in contact_event_reader.read() {
         let layout = TextureAtlasLayout::from_grid(UVec2::splat(48), 5, 1, None, None);
         let texture_atlas_layout = texture_atlas_layouts.add(layout);
-        let animation_config_1 = AnimationConfig::new(1, 6, 10);
+        let animation_config = AnimationConfig::new(0, 4, 30);
 
         commands.spawn((
             Sprite {
                 image: asset_server.load("sprites/contact_sheet.png"),
                 texture_atlas: Some(TextureAtlas {
                     layout: texture_atlas_layout,
-                    index: animation_config_1.first_sprite_index,
+                    index: animation_config.first_sprite_index,
                 }),
                 ..default()
             },
@@ -79,6 +107,8 @@ pub fn contact_spawn(
                 cursor_pos.single().translation.y,
                 -2.0,
             ),
+            ContactSprite,
+            animation_config,
         ));
     }
 }

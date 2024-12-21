@@ -2,7 +2,7 @@ use avian2d::prelude::*;
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_kira_audio::prelude::*;
 
-use super::Scores;
+use super::{AnimationConfig, Scores};
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 
 #[derive(Component)]
@@ -48,7 +48,7 @@ pub fn setup(
     audio.play(asset_server.load("sounds/start.ogg"));
 
     //lock and hide crosshair
-    window.cursor_options.visible = false;
+    //window.cursor_options.visible = false;
     window.cursor_options.grab_mode = CursorGrabMode::Confined;
 
     //end game timer creation
@@ -69,24 +69,23 @@ pub fn setup(
     //spawn m4 with animation props
     let layout = TextureAtlasLayout::from_grid(UVec2::new(1550, 720), 5, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let animation_indices = AnimationIndices { first: 1, last: 4 };
+    let animation_config = AnimationConfig::new(0, 4, 30);
 
-    commands
-        // Spawn a bevy sprite-sheet
-        .spawn((
-            Sprite::from_atlas_image(
-                asset_server.load("sprites/m4_sheet.png"),
-                TextureAtlas {
-                    layout: texture_atlas_layout,
-                    index: animation_indices.first,
-                },
-            ),
-            M4 {
-                lifetime: Timer::from_seconds(0.2, TimerMode::Once),
-                okay_to_shoot: true,
+    commands.spawn((
+        Sprite::from_atlas_image(
+            asset_server.load("sprites/m4_sheet.png"),
+            TextureAtlas {
+                layout: texture_atlas_layout,
+                index: animation_config.first_sprite_index,
             },
-            InGameEntity,
-        ));
+        ),
+        animation_config,
+        M4 {
+            lifetime: Timer::from_seconds(0.2, TimerMode::Once),
+            okay_to_shoot: true,
+        },
+        InGameEntity,
+    ));
 
     //crosshair and collision spawn
     commands.spawn((
@@ -102,7 +101,7 @@ pub fn setup(
         Sprite::from_image(asset_server.load("sprites/wall.png")),
         Transform::from_xyz(SCREEN_WIDTH / 2.0, 0.0, -6.0),
         Friction::new(0.0).with_combine_rule(CoefficientCombine::Min),
-        Collider::rectangle(100.0, SCREEN_HEIGHT / 2.0 + 500.0),
+        Collider::rectangle(200.0, SCREEN_HEIGHT / 2.0 + 500.0),
         InGameEntity,
     ));
 
@@ -111,7 +110,7 @@ pub fn setup(
         Sprite::from_image(asset_server.load("sprites/wall.png")),
         Transform::from_xyz(-SCREEN_WIDTH / 2.0, 0.0, -6.0),
         Friction::new(0.0).with_combine_rule(CoefficientCombine::Min),
-        Collider::rectangle(100.0, SCREEN_HEIGHT / 2.0 + 500.0),
+        Collider::rectangle(200.0, SCREEN_HEIGHT / 2.0 + 500.0),
         InGameEntity,
     ));
 }
@@ -143,6 +142,7 @@ pub fn game_difficulty_medium(mut commands: Commands, asset_server: Res<AssetSer
         Sprite::from_image(asset_server.load("sprites/medium_ball.png")),
         Transform::from_xyz(0.0, 0.0, -6.0),
         RigidBody::Dynamic,
+        RigidBodyDisabled,
         Collider::circle(50.0),
         Mass(0.1),
         GravityScale(30.0),

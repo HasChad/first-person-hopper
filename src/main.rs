@@ -1,7 +1,7 @@
 // #![windows_subsystem = "windows"] //to disable console
 
 use avian2d::prelude::*;
-use bevy::{prelude::*, window::WindowMode};
+use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*, window::WindowMode};
 use bevy_kira_audio::prelude::*;
 
 pub mod gameover;
@@ -55,6 +55,7 @@ fn main() {
         .add_plugins(AudioPlugin)
         .add_plugins(PhysicsPlugins::default())
         .add_plugins(PhysicsDebugPlugin::default())
+        .add_plugins(FrameTimeDiagnosticsPlugin)
         //systems
         .add_systems(Startup, setup)
         //states

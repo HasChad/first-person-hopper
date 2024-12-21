@@ -40,21 +40,22 @@ impl Plugin for InGamePlugin {
         .add_systems(
             Update,
             (
-                sprite_animator,
-                contact_spawn,
                 cursor_position,
+                m4_firerate_timer,
                 ball_jump,
                 ball_contact_checker,
-                m4_firerate_timer,
-                ui_update,
                 gameover_controller,
+                contact_spawn,
+                m4_sprite_animator,
+                contact_sprite_animator,
+                score_text_updater,
+                fps_text_updater,
             )
                 .run_if(in_state(GameState::InGame)),
         )
         .add_systems(OnExit(GameState::InGame), despawn_screen::<InGameEntity>)
         .add_event::<HitEvent>()
         .add_event::<ShootingEvent>()
-        .insert_resource(PlayAnimation(false))
         .insert_resource(Scores {
             current_score: 0,
             high_score: 0,
