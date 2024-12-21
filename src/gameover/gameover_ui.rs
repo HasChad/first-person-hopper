@@ -51,60 +51,74 @@ pub fn setup(
                     ..default()
                 })
                 // game over, yellow background
-                .with_child((
-                    //"game over" text
-                    Text::new("GAME OVER"),
-                    TextFont {
-                        font: asset_server.load(CUSTOM_FONT),
-                        font_size: 120.0,
-                        ..default()
-                    },
-                    TextColor(Color::BLACK),
-                    Node {
-                        width: Val::Px(800.0),
-                        height: Val::Px(100.0),
-                        align_items: AlignItems::Center,
-                        justify_content: JustifyContent::Center,
-                        ..default()
-                    },
-                    BackgroundColor(Color::srgb(255.0, 192.0, 0.0)),
-                ))
+                .with_children(|parent| {
+                    parent
+                        .spawn((
+                            Node {
+                                width: Val::Px(800.0),
+                                height: Val::Px(100.0),
+                                align_items: AlignItems::Center,
+                                justify_content: JustifyContent::Center,
+                                ..default()
+                            },
+                            BackgroundColor(Color::srgb(255.0, 192.0, 0.0)),
+                        ))
+                        .with_child((
+                            Text::new("GAME OVER"),
+                            TextFont {
+                                font: asset_server.load(CUSTOM_FONT),
+                                font_size: 120.0,
+                                ..default()
+                            },
+                            TextColor(Color::BLACK),
+                        ));
+                })
                 // current score, black background
-                .with_child((
-                    Text::new(format!("SCORE: {}", scores.current_score)),
-                    TextFont {
-                        font: asset_server.load(CUSTOM_FONT),
-                        font_size: 70.0,
-                        ..default()
-                    },
-                    TextColor(Color::WHITE),
-                    Node {
-                        width: Val::Px(550.0),
-                        height: Val::Px(75.0),
-                        align_items: AlignItems::Center,
-                        justify_content: JustifyContent::Center,
-                        ..default()
-                    },
-                    BackgroundColor(Color::BLACK),
-                ))
+                .with_children(|parent| {
+                    parent
+                        .spawn((
+                            Node {
+                                width: Val::Px(550.0),
+                                height: Val::Px(75.0),
+                                align_items: AlignItems::Center,
+                                justify_content: JustifyContent::Center,
+                                ..default()
+                            },
+                            BackgroundColor(Color::BLACK),
+                        ))
+                        .with_child((
+                            Text::new(format!("SCORE: {}", scores.current_score)),
+                            TextFont {
+                                font: asset_server.load(CUSTOM_FONT),
+                                font_size: 70.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+                })
                 // high score, black background
-                .with_child((
-                    Text::new(format!("HIGH SCORE: {}", scores.current_score)),
-                    TextFont {
-                        font: asset_server.load(CUSTOM_FONT),
-                        font_size: 70.0,
-                        ..default()
-                    },
-                    TextColor(Color::WHITE),
-                    Node {
-                        width: Val::Px(550.0),
-                        height: Val::Px(75.0),
-                        align_items: AlignItems::Center,
-                        justify_content: JustifyContent::Center,
-                        ..default()
-                    },
-                    BackgroundColor(Color::BLACK),
-                ));
+                .with_children(|parent| {
+                    parent
+                        .spawn((
+                            Node {
+                                width: Val::Px(550.0),
+                                height: Val::Px(75.0),
+                                align_items: AlignItems::Center,
+                                justify_content: JustifyContent::Center,
+                                ..default()
+                            },
+                            BackgroundColor(Color::BLACK),
+                        ))
+                        .with_child((
+                            Text::new(format!("HIGH SCORE: {}", scores.current_score)),
+                            TextFont {
+                                font: asset_server.load(CUSTOM_FONT),
+                                font_size: 70.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+                });
         })
         // buttons
         .with_children(|parent| {
