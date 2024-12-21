@@ -51,7 +51,6 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
             MainMenuEntity,
         ))
         //title node bundle
-<<<<<<< HEAD
         .with_child((
             Sprite::from_image(asset_server.load("sprites/title.png")),
             Node {
@@ -64,27 +63,6 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                 ..default()
             },
         ))
-=======
-        .with_children(|parent| {
-            parent
-                .spawn(Node {
-                    height: Val::Percent(50.0),
-                    width: Val::Percent(100.0),
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    ..default()
-                })
-                .with_child((
-                    Text::new("FIRST PERSON HOPPER"),
-                    TextFont {
-                        font: asset_server.load(CUSTOM_FONT),
-                        font_size: 70.0,
-                        ..default()
-                    },
-                    TextColor(Color::WHITE),
-                ));
-        })
->>>>>>> e6f0790 (- ui fix)
         //button node bundle
         .with_children(|parent| {
             parent
