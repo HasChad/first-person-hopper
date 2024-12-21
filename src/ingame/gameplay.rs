@@ -22,6 +22,10 @@ pub fn cursor_position(
     mut crosshair_pos: Single<&mut Transform, With<CursorCrosshair>>,
     mut m4_pos: Single<&mut Transform, (With<M4>, Without<CursorCrosshair>)>,
 ) {
+<<<<<<< HEAD
+=======
+    info!("test");
+>>>>>>> d2af1ff (- fix)
     if let Some(cursor_pos) = cursor_pos_query.normalized {
         crosshair_pos.translation.x = cursor_pos.x;
         crosshair_pos.translation.y = cursor_pos.y;
