@@ -11,7 +11,6 @@ use ingame_ui::*;
 use spawn::*;
 
 use crate::despawn_screen;
-use crate::GameDifficultyState;
 use crate::GameState;
 
 #[derive(Resource)]
@@ -27,41 +26,34 @@ pub struct InGamePlugin;
 
 impl Plugin for InGamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            OnEnter(GameState::InGame),
-            (
-                setup,
-                ui_setup,
-                game_difficulty_easy.run_if(in_state(GameDifficultyState::Easy)),
-                game_difficulty_medium.run_if(in_state(GameDifficultyState::Medium)),
-                game_difficulty_hard.run_if(in_state(GameDifficultyState::Hard)),
-            ),
-        )
-        .add_systems(
-            Update,
-            (
-                cursor_position,
-                m4_firerate_timer,
-                ball_jump,
-                ball_contact_checker,
-                gameover_controller,
-                contact_spawn,
-                m4_sprite_animator,
-                contact_sprite_animator,
-                score_text_updater,
-                fps_text_updater,
+        app.add_systems(OnEnter(GameState::InGame), (setup, ui_setup))
+            .add_systems(
+                Update,
+                (
+                    cursor_position,
+                    m4_firerate_timer,
+                    ball_jump,
+                    ball_contact_checker,
+                    gameover_controller,
+                    // animation
+                    contact_spawn,
+                    m4_sprite_animator,
+                    contact_sprite_animator,
+                    // ui
+                    score_text_updater,
+                    fps_text_updater,
+                )
+                    .run_if(in_state(GameState::InGame)),
             )
-                .run_if(in_state(GameState::InGame)),
-        )
-        .add_systems(OnExit(GameState::InGame), despawn_screen::<InGameEntity>)
-        .add_event::<HitEvent>()
-        .add_event::<ShootingEvent>()
-        .insert_resource(Scores {
-            current_score: 0,
-            high_score: 0,
-            easy_hscore: 0,
-            medium_hscore: 0,
-            hard_hscore: 0,
-        });
+            .add_systems(OnExit(GameState::InGame), despawn_screen::<InGameEntity>)
+            .add_event::<HitEvent>()
+            .add_event::<ShootingEvent>()
+            .insert_resource(Scores {
+                current_score: 0,
+                high_score: 0,
+                easy_hscore: 0,
+                medium_hscore: 0,
+                hard_hscore: 0,
+            });
     }
 }

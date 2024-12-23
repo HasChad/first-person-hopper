@@ -70,6 +70,8 @@ pub fn ball_contact_checker(
     }
 }
 
+pub fn m4_shooting() {}
+
 pub fn ball_jump(
     mut scores: ResMut<Scores>,
     mut ball: Query<

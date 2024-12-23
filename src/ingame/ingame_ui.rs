@@ -14,19 +14,18 @@ pub struct FpsText;
 
 pub fn ui_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
-        Node {
-            height: Val::Percent(10.0),
-            width: Val::Percent(100.0),
-            justify_content: JustifyContent::Center,
-            ..default()
-        },
         Text::default(),
         TextFont {
             font: asset_server.load(CUSTOM_FONT),
-            font_size: 80.0,
+            font_size: 50.0,
             ..default()
         },
         TextColor(Color::WHITE),
+        Node {
+            justify_self: JustifySelf::Center,
+            align_self: AlignSelf::Start,
+            ..default()
+        },
         ScoreText,
     ));
 

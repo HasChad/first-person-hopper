@@ -44,8 +44,8 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
-                align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
                 ..default()
             },
             MainMenuEntity,
@@ -56,13 +56,12 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                 .spawn(Node {
                     height: Val::Percent(50.0),
                     width: Val::Percent(100.0),
-                    align_items: AlignItems::Center,
                     justify_content: JustifyContent::Center,
-
+                    align_items: AlignItems::Center,
                     ..default()
                 })
                 .with_child((
-                    Text::new(format!("FIRST PERSON HOPPER")),
+                    Text::new("FIRST PERSON HOPPER"),
                     TextFont {
                         font: asset_server.load(CUSTOM_FONT),
                         font_size: 100.0,
@@ -78,14 +77,13 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     height: Val::Percent(50.0),
                     width: Val::Percent(100.0),
                     flex_direction: FlexDirection::Row,
-                    align_items: AlignItems::Center,
                     justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
                     column_gap: Val::Px(50.0),
                     ..default()
                 })
                 //spawn easy button
                 .with_children(|parent| {
-                    //spawn easy button
                     parent
                         .spawn((
                             Button,
