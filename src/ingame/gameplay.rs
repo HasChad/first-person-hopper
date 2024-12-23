@@ -39,6 +39,14 @@ pub fn cursor_position(
     m4_pos.translation.y = cursor_pos.y - 400.0;
 }
 
+pub fn pause(mut time: ResMut<Time<Physics>>, scores: Res<Scores>) {
+    if scores.current_score == 0 {
+        time.pause();
+    } else {
+        time.unpause();
+    }
+}
+
 pub fn ball_contact_checker(
     audio: Res<Audio>,
     asset_server: Res<AssetServer>,
@@ -76,28 +84,25 @@ pub fn ball_jump(
     mut scores: ResMut<Scores>,
     mut ball: Query<
         (
-            &mut ExternalImpulse,
-            &mut ExternalTorque,
             &mut LinearVelocity,
             &mut AngularVelocity,
+            &mut ExternalImpulse,
+            &mut ExternalAngularImpulse,
         ),
         With<Ball>,
     >,
     mut event_reader: EventReader<HitEvent>,
 ) {
     for _event in event_reader.read() {
-        for (mut ball_impulse, mut ball_torque, mut ball_vel, mut ball_ang_vel) in &mut ball {
+        for (mut ball_vel, mut ball_ang_vel, mut ball_imp, mut ball_ang_imp) in &mut ball {
             let mut rng = rand::thread_rng();
 
             scores.current_score += 1;
 
             ball_vel.0 = Vec2::ZERO;
             ball_ang_vel.0 = 0.0;
-            ball_impulse.apply_impulse(Vec2::new(
-                rng.gen_range(-500000.0..500000.0),
-                rng.gen_range(500000.0..900000.0),
-            ));
-            ball_torque.apply_torque(rng.gen_range(-10000000.0..10000000.0));
+            ball_imp.apply_impulse(Vec2::new(0., rng.gen_range(100.0..300.0)));
+            ball_ang_imp.apply_impulse(rng.gen_range(-500.0..500.1));
         }
     }
 }

@@ -30,6 +30,8 @@ impl Plugin for InGamePlugin {
             .add_systems(
                 Update,
                 (
+                    // gameplay
+                    pause,
                     cursor_position,
                     m4_firerate_timer,
                     ball_jump,
@@ -41,7 +43,6 @@ impl Plugin for InGamePlugin {
                     contact_sprite_animator,
                     // ui
                     score_text_updater,
-                    fps_text_updater,
                 )
                     .run_if(in_state(GameState::InGame)),
             )

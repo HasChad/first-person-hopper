@@ -20,23 +20,6 @@ const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::WHITE;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
-    //version text
-    commands.spawn((
-        Text::new("v2.0alpha_test"),
-        TextFont {
-            font: asset_server.load(CUSTOM_FONT),
-            font_size: 25.0,
-            ..default()
-        },
-        TextColor(Color::WHITE),
-        Node {
-            position_type: PositionType::Absolute,
-            bottom: Val::Px(10.0),
-            right: Val::Px(10.0),
-            ..default()
-        },
-    ));
-
     //spawn full screen node bundle
     commands
         .spawn((
