@@ -99,7 +99,7 @@ pub fn ball_jump(
                 rng.gen_range(-400.0..400.0),
                 rng.gen_range(500.0..1000.0),
             ));
-            ball_ang_imp.apply_impulse(rng.gen_range(-500.0..500.0));
+            ball_ang_imp.apply_impulse(rng.gen_range(-5000.0..5000.0));
         }
     }
 }

@@ -40,9 +40,11 @@ impl Plugin for InGamePlugin {
                     gameover_controller,
                     score_saver,
                     // animation
-                    contact_spawn,
                     m4_sprite_animator,
+                    contact_spawn,
                     contact_sprite_animator,
+                    bullet_case_spawn,
+                    bullet_case_controller,
                     // ui
                     score_text_updater,
                 )

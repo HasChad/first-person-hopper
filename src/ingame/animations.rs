@@ -1,11 +1,13 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-// use bevy_kira_audio::prelude::*;
+use bevy_kira_audio::prelude::*;
 
 use crate::ingame::CursorCrosshair;
 use crate::ingame::HitEvent;
 use crate::ingame::M4;
+
+use super::ShootingEvent;
 
 #[derive(Component)]
 pub struct BulletCase {
@@ -121,12 +123,8 @@ pub fn fire_spawn(
     mut m4_event_reader: EventReader<M4AnimationEvent>,
 ) {
     for _event in m4_event_reader.iter() {
-        let mut rng = rand::thread_rng();
-
-        //fire effect spawner
         commands
-            // Spawn a bevy sprite-sheet
-            .spawn(SpriteSheetBundle {
+            .spawn((SpriteSheetBundle {
                 texture_atlas: textures.add(TextureAtlas::from_grid(
                     asset_server.load("sprites/fire_sheet.png"),
                     Vec2::new(432.0, 80.0),
@@ -145,48 +143,42 @@ pub fn fire_spawn(
                     ..default()
                 },
                 ..default()
-            })
-            //Create and insert an animation
-            .insert(Animation(benimator::Animation::once(
-                benimator::Animation::from_indices(0..=2, benimator::FrameRate::from_fps(24.0)),
-            )))
-            // Insert the state
-            .insert(BulletCase {
-                lifetime: Timer::from_seconds(0.2, TimerMode::Once),
-            })
-            .insert(AnimationState::default())
-            .insert(InGameEntity);
+            },
+            InGameEntity,
+            ));
+    }
+}
+*/
 
-        //bullet case spawner
-        commands
-            .spawn(SpriteBundle {
-                texture: asset_server.load("sprites/bullet_case.png"),
-                transform: Transform::from_xyz(
-                    m4_pos.single().translation.x,
-                    m4_pos.single().translation.y + 200.0,
-                    -1.0,
-                ),
-                ..default()
-            })
-            .insert(RigidBody::KinematicVelocityBased)
-            .insert(Velocity {
-                linvel: Vec2::new(rng.gen_range(4500.0..5500.0), 1000.0),
-                angvel: rng.gen_range(-15.0..-5.0),
-            });
+pub fn bullet_case_spawn(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    m4_pos: Single<&Transform, With<M4>>,
+    mut shooting_event_reader: EventReader<ShootingEvent>,
+) {
+    for _event in shooting_event_reader.read() {
+        commands.spawn((
+            Sprite::from_image(asset_server.load("sprites/bullet_case.png")),
+            Transform::from_xyz(m4_pos.translation.x, m4_pos.translation.y + 200.0, -1.0),
+            BulletCase {
+                lifetime: Timer::from_seconds(0.5, TimerMode::Once),
+            },
+        ));
     }
 }
 
-
-
-pub fn bullet_case_despawn(
+pub fn bullet_case_controller(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     audio: Res<Audio>,
-    mut casing: Query<(Entity, &mut BulletCase)>,
+    mut casing: Query<(Entity, &mut Transform, &mut BulletCase)>,
     time: Res<Time>,
 ) {
-    for (casing_entity, mut casing_timer) in &mut casing {
+    for (casing_entity, mut casing_transform, mut casing_timer) in &mut casing {
         casing_timer.lifetime.tick(time.delta());
+        casing_transform.translation.x += 10000.0 * time.delta_secs();
+        casing_transform.translation.y += 1000.0 * time.delta_secs();
+        casing_transform.rotate_z(-30.0 * time.delta_secs());
 
         if casing_timer.lifetime.finished() {
             commands.entity(casing_entity).despawn();
@@ -194,5 +186,3 @@ pub fn bullet_case_despawn(
         }
     }
 }
-
-*/
