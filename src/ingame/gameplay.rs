@@ -1,7 +1,5 @@
-#![allow(clippy::too_many_arguments)]
-
 use avian2d::prelude::*;
-use bevy::{prelude::*, utils::info, window::CursorGrabMode};
+use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_kira_audio::prelude::*;
 use rand::Rng;
 
@@ -67,10 +65,10 @@ pub fn ball_contact_checker(
 
     for _event in shooting_event_reader.read() {
         for Collision(contacts) in collision_event_reader.read() {
-            info!("test");
-
             if contacts.entity1 == ball_entity && contacts.entity2 == cross_entity {
                 hit_event_writer.send(HitEvent);
+                info!("test");
+                break;
             }
         }
     }
@@ -97,7 +95,10 @@ pub fn ball_jump(
 
             ball_vel.0 = Vec2::ZERO;
             ball_ang_vel.0 = 0.0;
-            ball_imp.apply_impulse(Vec2::new(0., rng.gen_range(100.0..300.0)));
+            ball_imp.apply_impulse(Vec2::new(
+                rng.gen_range(-400.0..400.0),
+                rng.gen_range(500.0..1000.0),
+            ));
             ball_ang_imp.apply_impulse(rng.gen_range(-500.0..500.0));
         }
     }
@@ -109,7 +110,7 @@ pub fn m4_firerate_timer(mut m4_timer: Single<&mut M4>, time: Res<Time>) {
 
         if m4_timer.lifetime.finished() {
             m4_timer.okay_to_shoot = true;
-            m4_timer.lifetime = Timer::from_seconds(0.2, TimerMode::Once);
+            m4_timer.lifetime.reset();
         }
     }
 }

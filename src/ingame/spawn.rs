@@ -92,8 +92,9 @@ pub fn setup(
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/wall.png")),
         Transform::from_xyz(-SCREEN_WIDTH / 2.0, 0.0, -6.0),
+        RigidBody::Static,
+        Collider::rectangle(200.0, 100000.0),
         Friction::new(0.0).with_combine_rule(CoefficientCombine::Min),
-        Collider::rectangle(200.0, SCREEN_HEIGHT / 2.0 + 500.0),
         InGameEntity,
     ));
 
@@ -101,8 +102,9 @@ pub fn setup(
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/wall.png")),
         Transform::from_xyz(SCREEN_WIDTH / 2.0, 0.0, -6.0).with_rotation(Quat::from_rotation_y(PI)),
+        RigidBody::Static,
+        Collider::rectangle(200.0, 100000.0),
         Friction::new(0.0).with_combine_rule(CoefficientCombine::Min),
-        Collider::rectangle(200.0, SCREEN_HEIGHT / 2.0 + 500.0),
         InGameEntity,
     ));
 
@@ -112,6 +114,7 @@ pub fn setup(
             commands.spawn((
                 Sprite::from_image(asset_server.load("sprites/easy_ball.png")),
                 Transform::from_xyz(0.0, 0.0, -6.0),
+                TransformInterpolation,
                 RigidBody::Dynamic,
                 Collider::circle(50.0),
                 Mass(1.0),
@@ -132,6 +135,7 @@ pub fn setup(
             commands.spawn((
                 Sprite::from_image(asset_server.load("sprites/medium_ball.png")),
                 Transform::from_xyz(0.0, 0.0, -6.0),
+                TransformInterpolation,
                 RigidBody::Dynamic,
                 Collider::circle(50.0),
                 Mass(1.0),
@@ -152,9 +156,10 @@ pub fn setup(
             commands.spawn((
                 Sprite::from_image(asset_server.load("sprites/hard_ball.png")),
                 Transform::from_xyz(0.0, 0.0, -6.0),
+                TransformInterpolation,
                 RigidBody::Dynamic,
                 Collider::circle(25.0),
-                Mass(0.4),
+                Mass(1.0),
                 GravityScale(24.0),
                 Restitution {
                     coefficient: 1.0,
