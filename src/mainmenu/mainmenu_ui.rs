@@ -1,7 +1,7 @@
-use bevy::{ecs::system::RunSystemOnce, prelude::*};
+use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
-use crate::{ingame::Scores, DespawnEvent, GameDifficultyState, GameState, CUSTOM_FONT};
+use crate::{ingame::Scores, GameDifficultyState, GameState, CUSTOM_FONT};
 
 #[derive(Component)]
 pub struct MainMenuEntity;
@@ -14,6 +14,9 @@ pub struct MediumButton;
 
 #[derive(Component)]
 pub struct HardButton;
+
+#[derive(Component)]
+pub struct QuitButton;
 
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
@@ -59,10 +62,11 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                 .spawn(Node {
                     height: Val::Percent(50.0),
                     width: Val::Percent(100.0),
-                    flex_direction: FlexDirection::Row,
+                    flex_direction: FlexDirection::Column,
                     justify_content: JustifyContent::Center,
                     align_items: AlignItems::Center,
                     column_gap: Val::Px(50.0),
+                    row_gap: Val::Px(10.0),
                     ..default()
                 })
                 //spawn easy button
@@ -145,6 +149,33 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                                 ..default()
                             },
                             TextColor(Color::srgb(0.88, 0.21, 0.20)),
+                        ));
+
+                    //spawn quit button
+                    parent
+                        .spawn((
+                            Button,
+                            Node {
+                                width: Val::Px(150.0),
+                                height: Val::Px(50.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            BorderColor(Color::BLACK),
+                            BorderRadius::MAX,
+                            BackgroundColor(NORMAL_BUTTON),
+                            QuitButton,
+                        ))
+                        .with_child((
+                            Text::new("QUIT"),
+                            TextFont {
+                                font: asset_server.load(CUSTOM_FONT),
+                                font_size: 20.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
                         ));
                 });
         });
@@ -238,6 +269,35 @@ pub fn hard_button_system(
                 border_color.0 = Color::BLACK;
                 next_game_state.set(GameState::InGame);
                 next_difficulty_state.set(GameDifficultyState::Hard);
+            }
+        }
+    }
+}
+
+pub fn quit_button_system(
+    mut app_exit_events: ResMut<Events<bevy::app::AppExit>>,
+    asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
+    mut interaction_query: Query<
+        (&Interaction, &mut BackgroundColor, &mut BorderColor),
+        (Changed<Interaction>, With<QuitButton>),
+    >,
+) {
+    for (interaction, mut color, mut border_color) in &mut interaction_query {
+        match *interaction {
+            Interaction::None => {
+                *color = NORMAL_BUTTON.into();
+                border_color.0 = Color::BLACK;
+            }
+            Interaction::Hovered => {
+                *color = HOVERED_BUTTON.into();
+                border_color.0 = Color::WHITE;
+                audio.play(asset_server.load("sounds/hover_button.ogg"));
+            }
+            Interaction::Pressed => {
+                *color = PRESSED_BUTTON.into();
+                border_color.0 = Color::BLACK;
+                app_exit_events.send(AppExit::Success);
             }
         }
     }

@@ -33,10 +33,12 @@ impl Plugin for InGamePlugin {
                     // gameplay
                     pause,
                     cursor_position,
+                    m4_shooting,
                     m4_firerate_timer,
                     ball_jump,
                     ball_contact_checker,
                     gameover_controller,
+                    score_saver,
                     // animation
                     contact_spawn,
                     m4_sprite_animator,

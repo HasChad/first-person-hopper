@@ -21,13 +21,7 @@ pub fn cursor_position(
     windows: Query<&Window>,
 ) {
     let (camera, camera_transform) = *camera_query;
-
-    let window = windows.single();
-
-    let Some(cursor_position) = window.cursor_position() else {
-        return;
-    };
-
+    let cursor_position = windows.single().cursor_position().unwrap();
     let Ok(cursor_pos) = camera.viewport_to_world_2d(camera_transform, cursor_position) else {
         return;
     };
@@ -47,38 +41,40 @@ pub fn pause(mut time: ResMut<Time<Physics>>, scores: Res<Scores>) {
     }
 }
 
-pub fn ball_contact_checker(
+pub fn m4_shooting(
     audio: Res<Audio>,
     asset_server: Res<AssetServer>,
-    ball: Query<Entity, With<Ball>>,
+    mut m4_props: Single<&mut M4>,
     mouse_input: Res<ButtonInput<MouseButton>>,
-    crosshair: Query<Entity, With<CursorCrosshair>>,
-    mut m4: Query<&mut M4>,
-    mut hit_event_writer: EventWriter<HitEvent>,
     mut shooting_event_writer: EventWriter<ShootingEvent>,
+) {
+    if mouse_input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
+        m4_props.okay_to_shoot = false;
+        audio.play(asset_server.load("sounds/M4.ogg"));
+        shooting_event_writer.send(ShootingEvent);
+    }
+}
+
+pub fn ball_contact_checker(
+    ball: Query<Entity, With<Ball>>,
+    crosshair: Query<Entity, With<CursorCrosshair>>,
+    mut hit_event_writer: EventWriter<HitEvent>,
+    mut shooting_event_reader: EventReader<ShootingEvent>,
     mut collision_event_reader: EventReader<Collision>,
 ) {
     let ball_entity = ball.single();
     let cross_entity = crosshair.single();
-    let mut m4_props = m4.single_mut();
 
-    if mouse_input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
-        m4_props.okay_to_shoot = false;
-        shooting_event_writer.send(ShootingEvent);
-
-        audio.play(asset_server.load("sounds/M4.ogg"));
-
+    for _event in shooting_event_reader.read() {
         for Collision(contacts) in collision_event_reader.read() {
+            info!("test");
+
             if contacts.entity1 == ball_entity && contacts.entity2 == cross_entity {
                 hit_event_writer.send(HitEvent);
-
-                info("nice");
             }
         }
     }
 }
-
-pub fn m4_shooting() {}
 
 pub fn ball_jump(
     mut scores: ResMut<Scores>,
@@ -102,7 +98,7 @@ pub fn ball_jump(
             ball_vel.0 = Vec2::ZERO;
             ball_ang_vel.0 = 0.0;
             ball_imp.apply_impulse(Vec2::new(0., rng.gen_range(100.0..300.0)));
-            ball_ang_imp.apply_impulse(rng.gen_range(-500.0..500.1));
+            ball_ang_imp.apply_impulse(rng.gen_range(-500.0..500.0));
         }
     }
 }
@@ -139,7 +135,7 @@ pub fn gameover_controller(
     }
 }
 
-pub fn score_writer(
+pub fn score_saver(
     mut scores: ResMut<Scores>,
     game_difficulty_state: Res<State<GameDifficultyState>>,
 ) {

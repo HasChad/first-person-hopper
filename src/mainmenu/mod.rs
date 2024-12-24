@@ -13,7 +13,12 @@ impl Plugin for MainMenuPlugin {
         app.add_systems(OnEnter(GameState::MainMenu), setup)
             .add_systems(
                 Update,
-                (easy_button_system, medium_button_system, hard_button_system),
+                (
+                    easy_button_system,
+                    medium_button_system,
+                    hard_button_system,
+                    quit_button_system,
+                ),
             )
             .add_systems(
                 OnExit(GameState::MainMenu),

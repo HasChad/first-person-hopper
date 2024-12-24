@@ -90,7 +90,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         Text::new("v2.0alpha_test"),
         TextFont {
             font: asset_server.load(CUSTOM_FONT),
-            font_size: 25.0,
+            font_size: 15.0,
             ..default()
         },
         TextColor(Color::WHITE),
@@ -107,7 +107,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .spawn((
             Text::new("FPS: "),
             TextFont {
-                font_size: 20.0,
+                font_size: 15.0,
                 ..default()
             },
             Node {
@@ -122,7 +122,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_child((
             TextSpan::default(),
             TextFont {
-                font_size: 20.0,
+                font_size: 15.0,
                 ..default()
             },
             TextColor(GOLD.into()),
