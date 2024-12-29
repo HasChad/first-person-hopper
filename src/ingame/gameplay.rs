@@ -31,14 +31,6 @@ pub fn cursor_position(
     m4_pos.translation.y = cursor_pos.y - 400.0;
 }
 
-pub fn pause(mut time: ResMut<Time<Physics>>, scores: Res<Scores>) {
-    if scores.current_score == 0 {
-        time.pause();
-    } else {
-        time.unpause();
-    }
-}
-
 pub fn m4_shooting(
     audio: Res<Audio>,
     asset_server: Res<AssetServer>,
@@ -50,6 +42,25 @@ pub fn m4_shooting(
         m4_props.okay_to_shoot = false;
         audio.play(asset_server.load("sounds/M4.ogg"));
         shooting_event_writer.send(ShootingEvent);
+    }
+}
+
+pub fn m4_firerate_timer(mut m4_timer: Single<&mut M4>, time: Res<Time>) {
+    if !m4_timer.okay_to_shoot {
+        m4_timer.lifetime.tick(time.delta());
+
+        if m4_timer.lifetime.finished() {
+            m4_timer.okay_to_shoot = true;
+            m4_timer.lifetime.reset();
+        }
+    }
+}
+
+pub fn ball_pause(mut time: ResMut<Time<Physics>>, scores: Res<Scores>) {
+    if scores.current_score == 0 {
+        time.pause();
+    } else {
+        time.unpause();
     }
 }
 
@@ -100,17 +111,6 @@ pub fn ball_jump(
                 rng.gen_range(500.0..1000.0),
             ));
             ball_ang_imp.apply_impulse(rng.gen_range(-5000.0..5000.0));
-        }
-    }
-}
-
-pub fn m4_firerate_timer(mut m4_timer: Single<&mut M4>, time: Res<Time>) {
-    if !m4_timer.okay_to_shoot {
-        m4_timer.lifetime.tick(time.delta());
-
-        if m4_timer.lifetime.finished() {
-            m4_timer.okay_to_shoot = true;
-            m4_timer.lifetime.reset();
         }
     }
 }

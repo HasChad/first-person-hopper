@@ -12,9 +12,9 @@ pub struct HomeButton;
 #[derive(Component)]
 pub struct RestartButton;
 
-const PRESSED_BUTTON: Color = Color::WHITE;
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
+const PRESSED_BUTTON: Color = Color::WHITE;
 
 pub fn setup(
     mut commands: Commands,

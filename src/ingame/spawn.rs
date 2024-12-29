@@ -26,7 +26,7 @@ pub struct EndGameTimer {
     pub lifetime: Timer,
 }
 
-pub fn setup(
+pub fn ingame_setup(
     audio: Res<Audio>,
     mut commands: Commands,
     game_difficulty_state: Res<State<GameDifficultyState>>,

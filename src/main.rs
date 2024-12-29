@@ -52,8 +52,9 @@ fn main() {
                     primary_window: Some(Window {
                         title: "First Person Hopper".into(),
                         resolution: (SCREEN_WIDTH, SCREEN_HEIGHT).into(),
-                        resizable: false,
+                        resizable: true,
                         mode: WindowMode::Windowed,
+                        position: WindowPosition::Centered(MonitorSelection::Primary),
                         ..default()
                     }),
                     ..default()

@@ -26,15 +26,15 @@ pub struct InGamePlugin;
 
 impl Plugin for InGamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::InGame), (setup, ui_setup))
+        app.add_systems(OnEnter(GameState::InGame), (ingame_setup, ui_setup))
             .add_systems(
                 Update,
                 (
                     // gameplay
-                    pause,
                     cursor_position,
                     m4_shooting,
                     m4_firerate_timer,
+                    ball_pause,
                     ball_jump,
                     ball_contact_checker,
                     gameover_controller,
