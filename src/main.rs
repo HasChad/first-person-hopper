@@ -5,6 +5,7 @@ use bevy::{
     color::palettes::css::GOLD,
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
+    render::camera::ScalingMode,
     window::WindowMode,
 };
 use bevy_kira_audio::prelude::*;
@@ -78,7 +79,16 @@ fn main() {
 }
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2d);
+    commands.spawn((
+        Camera2d,
+        Projection::Orthographic(OrthographicProjection {
+            scaling_mode: ScalingMode::Fixed {
+                width: SCREEN_WIDTH,
+                height: SCREEN_HEIGHT,
+            },
+            ..OrthographicProjection::default_2d()
+        }),
+    ));
 
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/menu_background.png")),

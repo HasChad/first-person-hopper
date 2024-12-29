@@ -4,7 +4,7 @@ use bevy_kira_audio::prelude::*;
 use std::f32::consts::PI;
 
 use super::{AnimationConfig, Scores};
-use crate::{GameDifficultyState, SCREEN_HEIGHT, SCREEN_WIDTH};
+use crate::{GameDifficultyState, SCREEN_WIDTH};
 
 #[derive(Component)]
 pub struct InGameEntity;
