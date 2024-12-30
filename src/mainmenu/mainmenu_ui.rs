@@ -23,7 +23,7 @@ const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::WHITE;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
-    //spawn full screen node bundle
+    // full screen node
     commands
         .spawn((
             Node {
@@ -36,7 +36,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
             },
             MainMenuEntity,
         ))
-        //title node bundle
+        // title node
         .with_children(|parent| {
             parent
                 .spawn(Node {
@@ -56,7 +56,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     TextColor(Color::WHITE),
                 ));
         })
-        //button node bundle
+        // button node
         .with_children(|parent| {
             parent
                 .spawn(Node {
@@ -69,7 +69,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     row_gap: Val::Px(10.0),
                     ..default()
                 })
-                //spawn easy button
+                // easy button
                 .with_children(|parent| {
                     parent
                         .spawn((
@@ -97,7 +97,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             TextColor(Color::srgb(0.19, 0.76, 0.41)),
                         ));
 
-                    //spawn normal button
+                    // normal button
                     parent
                         .spawn((
                             Button,
@@ -124,7 +124,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             TextColor(Color::srgb(0.35, 0.67, 0.89)),
                         ));
 
-                    //spawn hard button
+                    // hard button
                     parent
                         .spawn((
                             Button,
@@ -151,7 +151,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             TextColor(Color::srgb(0.88, 0.21, 0.20)),
                         ));
 
-                    //spawn quit button
+                    // quit button
                     parent
                         .spawn((
                             Button,

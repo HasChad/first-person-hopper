@@ -18,9 +18,6 @@ use gameover::GameOverPlugin;
 use ingame::InGamePlugin;
 use mainmenu::MainMenuPlugin;
 
-#[derive(Event)]
-pub struct DespawnEvent;
-
 #[derive(Component)]
 pub struct FpsText;
 
@@ -140,13 +137,6 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ));
 }
 
-// Generic system that takes a component as a parameter, and will despawn all entities with that component
-fn despawn_screen<T: Component>(to_despawn: Query<Entity, With<T>>, mut commands: Commands) {
-    for entity in &to_despawn {
-        commands.entity(entity).despawn_recursive();
-    }
-}
-
 pub fn fps_text_updater(
     mut writer: TextUiWriter,
     diagnostics: Res<DiagnosticsStore>,
@@ -156,5 +146,12 @@ pub fn fps_text_updater(
         if let Some(value) = fps.smoothed() {
             *writer.text(*entity, 1) = format!("{value:.0}");
         }
+    }
+}
+
+// Generic system that takes a component as a parameter, and will despawn all entities with that component
+fn despawn_screen<T: Component>(to_despawn: Query<Entity, With<T>>, mut commands: Commands) {
+    for entity in &to_despawn {
+        commands.entity(entity).despawn_recursive();
     }
 }

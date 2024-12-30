@@ -133,33 +133,6 @@ pub fn setup(
                     ..default()
                 })
                 .with_children(|parent| {
-                    //spawn main menu button
-                    parent
-                        .spawn((
-                            Button,
-                            Node {
-                                width: Val::Px(220.0),
-                                height: Val::Px(65.0),
-                                border: UiRect::all(Val::Px(5.0)),
-                                justify_content: JustifyContent::Center,
-                                align_items: AlignItems::Center,
-                                ..default()
-                            },
-                            BorderColor(Color::BLACK),
-                            BorderRadius::MAX,
-                            BackgroundColor(NORMAL_BUTTON),
-                            HomeButton,
-                        ))
-                        .with_child((
-                            Text::new("MAIN MENU"),
-                            TextFont {
-                                font: asset_server.load(CUSTOM_FONT),
-                                font_size: 30.0,
-                                ..default()
-                            },
-                            TextColor(Color::WHITE),
-                        ));
-
                     // restart button
                     parent
                         .spawn((
@@ -179,6 +152,33 @@ pub fn setup(
                         ))
                         .with_child((
                             Text::new("RESTART"),
+                            TextFont {
+                                font: asset_server.load(CUSTOM_FONT),
+                                font_size: 30.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                        ));
+
+                    //spawn main menu button
+                    parent
+                        .spawn((
+                            Button,
+                            Node {
+                                width: Val::Px(220.0),
+                                height: Val::Px(65.0),
+                                border: UiRect::all(Val::Px(5.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                ..default()
+                            },
+                            BorderColor(Color::BLACK),
+                            BorderRadius::MAX,
+                            BackgroundColor(NORMAL_BUTTON),
+                            HomeButton,
+                        ))
+                        .with_child((
+                            Text::new("MAIN MENU"),
                             TextFont {
                                 font: asset_server.load(CUSTOM_FONT),
                                 font_size: 30.0,
