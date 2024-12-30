@@ -118,7 +118,7 @@ pub fn ingame_setup(
                 RigidBody::Dynamic,
                 Collider::circle(50.0),
                 Mass(1.0),
-                GravityScale(100.0),
+                GravityScale(150.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,
@@ -126,7 +126,7 @@ pub fn ingame_setup(
                 LinearVelocity::default(),
                 AngularVelocity::default(),
                 ExternalImpulse::default(),
-                ExternalTorque::default(),
+                ExternalAngularImpulse::default(),
                 Ball,
                 InGameEntity,
             ));

@@ -85,7 +85,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             BorderColor(Color::BLACK),
                             BorderRadius::MAX,
                             BackgroundColor(NORMAL_BUTTON),
-                            HardButton,
+                            EasyButton,
                         ))
                         .with_child((
                             Text::new(format!("EASY: {}", scores.easy_hscore)),
