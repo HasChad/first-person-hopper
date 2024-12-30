@@ -108,7 +108,7 @@ pub fn ball_jump(
             ball_ang_vel.0 = 0.0;
             ball_imp.apply_impulse(Vec2::new(
                 rng.gen_range(-400.0..400.0),
-                rng.gen_range(500.0..1000.0),
+                rng.gen_range(700.0..1000.0),
             ));
             ball_ang_imp.apply_impulse(rng.gen_range(-5000.0..5000.0));
         }
@@ -149,11 +149,11 @@ pub fn score_saver(
                 scores.high_score = scores.current_score
             }
         }
-        GameDifficultyState::Medium => {
-            scores.high_score = scores.medium_hscore;
+        GameDifficultyState::Normal => {
+            scores.high_score = scores.normal_hscore;
 
-            if scores.current_score > scores.medium_hscore {
-                scores.medium_hscore = scores.current_score;
+            if scores.current_score > scores.normal_hscore {
+                scores.normal_hscore = scores.current_score;
                 scores.high_score = scores.current_score
             }
         }

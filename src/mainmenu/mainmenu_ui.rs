@@ -10,7 +10,7 @@ pub struct MainMenuEntity;
 pub struct EasyButton;
 
 #[derive(Component)]
-pub struct MediumButton;
+pub struct NormalButton;
 
 #[derive(Component)]
 pub struct HardButton;
@@ -97,7 +97,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             TextColor(Color::srgb(0.19, 0.76, 0.41)),
                         ));
 
-                    //spawn medium button
+                    //spawn normal button
                     parent
                         .spawn((
                             Button,
@@ -112,10 +112,10 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                             BorderColor(Color::BLACK),
                             BorderRadius::MAX,
                             BackgroundColor(NORMAL_BUTTON),
-                            MediumButton,
+                            NormalButton,
                         ))
                         .with_child((
-                            Text::new(format!("MEDIUM: {}", scores.medium_hscore)),
+                            Text::new(format!("NORMAL: {}", scores.normal_hscore)),
                             TextFont {
                                 font: asset_server.load(CUSTOM_FONT),
                                 font_size: 30.0,
@@ -212,14 +212,14 @@ pub fn easy_button_system(
     }
 }
 
-pub fn medium_button_system(
+pub fn normal_button_system(
     asset_server: Res<AssetServer>,
     audio: Res<Audio>,
     mut next_game_state: ResMut<NextState<GameState>>,
     mut next_difficulty_state: ResMut<NextState<GameDifficultyState>>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &mut BorderColor),
-        (Changed<Interaction>, With<MediumButton>),
+        (Changed<Interaction>, With<NormalButton>),
     >,
 ) {
     for (interaction, mut color, mut border_color) in &mut interaction_query {
@@ -237,7 +237,7 @@ pub fn medium_button_system(
                 *color = PRESSED_BUTTON.into();
                 border_color.0 = Color::BLACK;
                 next_game_state.set(GameState::InGame);
-                next_difficulty_state.set(GameDifficultyState::Medium);
+                next_difficulty_state.set(GameDifficultyState::Normal);
             }
         }
     }

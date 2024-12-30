@@ -40,7 +40,7 @@ pub enum GameState {
 pub enum GameDifficultyState {
     #[default]
     Easy,
-    Medium,
+    Normal,
     Hard,
 }
 

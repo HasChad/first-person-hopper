@@ -18,7 +18,7 @@ pub struct Scores {
     pub current_score: i32,
     pub high_score: i32,
     pub easy_hscore: i32,
-    pub medium_hscore: i32,
+    pub normal_hscore: i32,
     pub hard_hscore: i32,
 }
 
@@ -57,7 +57,7 @@ impl Plugin for InGamePlugin {
                 current_score: 0,
                 high_score: 0,
                 easy_hscore: 0,
-                medium_hscore: 0,
+                normal_hscore: 0,
                 hard_hscore: 0,
             });
     }

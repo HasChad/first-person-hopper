@@ -131,15 +131,15 @@ pub fn ingame_setup(
                 InGameEntity,
             ));
         }
-        GameDifficultyState::Medium => {
+        GameDifficultyState::Normal => {
             commands.spawn((
-                Sprite::from_image(asset_server.load("sprites/medium_ball.png")),
+                Sprite::from_image(asset_server.load("sprites/normal_ball.png")),
                 Transform::from_xyz(0.0, 0.0, -6.0),
                 TransformInterpolation,
                 RigidBody::Dynamic,
                 Collider::circle(50.0),
                 Mass(1.0),
-                GravityScale(150.0),
+                GravityScale(220.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,
@@ -159,16 +159,16 @@ pub fn ingame_setup(
                 TransformInterpolation,
                 RigidBody::Dynamic,
                 Collider::circle(25.0),
-                Mass(1.0),
-                GravityScale(24.0),
+                Mass(1.1),
+                GravityScale(230.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,
                 },
                 LinearVelocity::default(),
-                ExternalImpulse::default(),
                 AngularVelocity::default(),
-                ExternalTorque::default(),
+                ExternalImpulse::default(),
+                ExternalAngularImpulse::default(),
                 Ball,
                 InGameEntity,
             ));

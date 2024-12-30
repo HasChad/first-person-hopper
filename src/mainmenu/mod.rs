@@ -15,7 +15,7 @@ impl Plugin for MainMenuPlugin {
                 Update,
                 (
                     easy_button_system,
-                    medium_button_system,
+                    normal_button_system,
                     hard_button_system,
                     quit_button_system,
                 ),
