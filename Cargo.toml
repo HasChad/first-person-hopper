@@ -13,7 +13,7 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = { version = "0.15.0", default-features = false, features = [
+bevy = { version = "0.15.1", default-features = false, features = [
     # Default features
     "bevy_animation",     # Provides animation functionality
     "bevy_asset",         # Provides asset functionality
@@ -37,7 +37,7 @@ bevy = { version = "0.15.0", default-features = false, features = [
     "serialize",       # Support for `serde` Serialize/Deserialize
     "dynamic_linking", # Dynamic linking for faster compile-times
 ] }
-bevy_kira_audio = "0.21.0"
+bevy_kira_audio = "0.22.0"
 avian2d = "0.2.0"
 rand = "0.8.5"
 
