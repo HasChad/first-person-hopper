@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
-use crate::{ingame::Scores, GameDifficultyState, GameState, CUSTOM_FONT};
-
-#[derive(Component)]
-pub struct MainMenuEntity;
+use crate::{
+    ingame::Scores, ButtonQuery, GameDifficultyState, GameState, CUSTOM_FONT, HOVERED_BUTTON,
+    NORMAL_BUTTON, PRESSED_BUTTON,
+};
 
 #[derive(Component)]
 pub struct EasyButton;
@@ -18,9 +18,8 @@ pub struct HardButton;
 #[derive(Component)]
 pub struct QuitButton;
 
-const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
-const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
-const PRESSED_BUTTON: Color = Color::WHITE;
+#[derive(Component)]
+pub struct MainMenuEntity;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
     // full screen node
@@ -186,25 +185,22 @@ pub fn easy_button_system(
     audio: Res<Audio>,
     mut next_game_state: ResMut<NextState<GameState>>,
     mut next_difficulty_state: ResMut<NextState<GameDifficultyState>>,
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &mut BorderColor),
-        (Changed<Interaction>, With<EasyButton>),
-    >,
+    mut button_query: Query<ButtonQuery, (Changed<Interaction>, With<EasyButton>)>,
 ) {
-    for (interaction, mut color, mut border_color) in &mut interaction_query {
-        match *interaction {
+    for mut button in button_query.iter_mut() {
+        match *button.interaction {
             Interaction::None => {
-                *color = NORMAL_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = NORMAL_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
-                *color = HOVERED_BUTTON.into();
-                border_color.0 = Color::WHITE;
+                *button.color = HOVERED_BUTTON.into();
+                button.border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::Pressed => {
-                *color = PRESSED_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = PRESSED_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
                 next_game_state.set(GameState::InGame);
                 next_difficulty_state.set(GameDifficultyState::Easy);
             }
@@ -217,25 +213,22 @@ pub fn normal_button_system(
     audio: Res<Audio>,
     mut next_game_state: ResMut<NextState<GameState>>,
     mut next_difficulty_state: ResMut<NextState<GameDifficultyState>>,
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &mut BorderColor),
-        (Changed<Interaction>, With<NormalButton>),
-    >,
+    mut button_query: Query<ButtonQuery, (Changed<Interaction>, With<NormalButton>)>,
 ) {
-    for (interaction, mut color, mut border_color) in &mut interaction_query {
-        match *interaction {
+    for mut button in button_query.iter_mut() {
+        match *button.interaction {
             Interaction::None => {
-                *color = NORMAL_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = NORMAL_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
-                *color = HOVERED_BUTTON.into();
-                border_color.0 = Color::WHITE;
+                *button.color = HOVERED_BUTTON.into();
+                button.border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::Pressed => {
-                *color = PRESSED_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = PRESSED_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
                 next_game_state.set(GameState::InGame);
                 next_difficulty_state.set(GameDifficultyState::Normal);
             }
@@ -248,25 +241,22 @@ pub fn hard_button_system(
     audio: Res<Audio>,
     mut next_game_state: ResMut<NextState<GameState>>,
     mut next_difficulty_state: ResMut<NextState<GameDifficultyState>>,
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &mut BorderColor),
-        (Changed<Interaction>, With<HardButton>),
-    >,
+    mut button_query: Query<ButtonQuery, (Changed<Interaction>, With<HardButton>)>,
 ) {
-    for (interaction, mut color, mut border_color) in &mut interaction_query {
-        match *interaction {
+    for mut button in button_query.iter_mut() {
+        match *button.interaction {
             Interaction::None => {
-                *color = NORMAL_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = NORMAL_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
-                *color = HOVERED_BUTTON.into();
-                border_color.0 = Color::WHITE;
+                *button.color = HOVERED_BUTTON.into();
+                button.border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::Pressed => {
-                *color = PRESSED_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = PRESSED_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
                 next_game_state.set(GameState::InGame);
                 next_difficulty_state.set(GameDifficultyState::Hard);
             }
@@ -278,25 +268,22 @@ pub fn quit_button_system(
     mut app_exit_events: ResMut<Events<bevy::app::AppExit>>,
     asset_server: Res<AssetServer>,
     audio: Res<Audio>,
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &mut BorderColor),
-        (Changed<Interaction>, With<QuitButton>),
-    >,
+    mut button_query: Query<ButtonQuery, (Changed<Interaction>, With<QuitButton>)>,
 ) {
-    for (interaction, mut color, mut border_color) in &mut interaction_query {
-        match *interaction {
+    for mut button in button_query.iter_mut() {
+        match *button.interaction {
             Interaction::None => {
-                *color = NORMAL_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = NORMAL_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
-                *color = HOVERED_BUTTON.into();
-                border_color.0 = Color::WHITE;
+                *button.color = HOVERED_BUTTON.into();
+                button.border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::Pressed => {
-                *color = PRESSED_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = PRESSED_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
                 app_exit_events.send(AppExit::Success);
             }
         }

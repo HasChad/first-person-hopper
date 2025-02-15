@@ -4,6 +4,7 @@ use avian2d::prelude::*;
 use bevy::{
     color::palettes::css::GOLD,
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
+    ecs::query::QueryData,
     prelude::*,
     render::camera::ScalingMode,
     window::WindowMode,
@@ -24,6 +25,18 @@ pub struct FpsText;
 pub const SCREEN_WIDTH: f32 = 1280.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
 pub const CUSTOM_FONT: &str = "fonts/NotoSans-Medium.ttf";
+
+#[derive(QueryData)]
+#[query_data(mutable)]
+pub struct ButtonQuery {
+    interaction: &'static Interaction,
+    color: &'static mut BackgroundColor,
+    border_color: &'static mut BorderColor,
+}
+
+const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
+const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
+const PRESSED_BUTTON: Color = Color::WHITE;
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 pub enum GameState {
@@ -80,14 +93,14 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Camera2d,
         Projection::Orthographic(OrthographicProjection {
-            scaling_mode: ScalingMode::Fixed {
-                width: SCREEN_WIDTH,
-                height: SCREEN_HEIGHT,
+            scaling_mode: ScalingMode::FixedVertical {
+                viewport_height: 1080.,
             },
             ..OrthographicProjection::default_2d()
         }),
     ));
 
+    // backround art
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/menu_background.png")),
         Transform::from_xyz(0.0, 0.0, -10.0),

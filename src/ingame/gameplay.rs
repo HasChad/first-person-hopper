@@ -1,7 +1,7 @@
 use avian2d::prelude::*;
 use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_kira_audio::prelude::*;
-use rand::Rng;
+use rand::random_range;
 
 use super::{Ball, CursorCrosshair, EndGameTimer, Scores, M4};
 use crate::{GameDifficultyState, GameState};
@@ -100,17 +100,15 @@ pub fn ball_jump(
 ) {
     for _event in event_reader.read() {
         for (mut ball_vel, mut ball_ang_vel, mut ball_imp, mut ball_ang_imp) in &mut ball {
-            let mut rng = rand::thread_rng();
-
             scores.current_score += 1;
 
             ball_vel.0 = Vec2::ZERO;
             ball_ang_vel.0 = 0.0;
             ball_imp.apply_impulse(Vec2::new(
-                rng.gen_range(-400.0..400.0),
-                rng.gen_range(700.0..1000.0),
+                random_range(-400.0..400.0),
+                random_range(700.0..1000.0),
             ));
-            ball_ang_imp.apply_impulse(rng.gen_range(-5000.0..5000.0));
+            ball_ang_imp.apply_impulse(random_range(-5000.0..5000.0));
         }
     }
 }
