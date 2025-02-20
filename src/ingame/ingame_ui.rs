@@ -30,5 +30,5 @@ pub fn score_text_updater(
     scores: ResMut<Scores>,
     entity: Single<Entity, With<ScoreText>>,
 ) {
-    *writer.text(*entity, 0) = format!("{}", scores.current_score.to_string());
+    *writer.text(*entity, 0) = scores.current_score.to_string();
 }

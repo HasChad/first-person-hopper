@@ -76,6 +76,8 @@ pub fn ball_contact_checker(
 
     for _event in shooting_event_reader.read() {
         for Collision(contacts) in collision_event_reader.read() {
+            info!("ent1 = {}", contacts.entity1);
+            info!("ent2 = {}", contacts.entity2);
             if contacts.entity1 == ball_entity && contacts.entity2 == cross_entity {
                 hit_event_writer.send(HitEvent);
                 info!("test");

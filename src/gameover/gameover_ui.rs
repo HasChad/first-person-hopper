@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
-use crate::{ingame::Scores, GameState, CUSTOM_FONT};
+use crate::{
+    ingame::Scores, ButtonQuery, GameState, CUSTOM_FONT, HOVERED_BUTTON, NORMAL_BUTTON,
+    PRESSED_BUTTON,
+};
 
 #[derive(Component)]
 pub struct GameOverEntity;
@@ -11,10 +14,6 @@ pub struct HomeButton;
 
 #[derive(Component)]
 pub struct RestartButton;
-
-const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
-const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
-const PRESSED_BUTTON: Color = Color::WHITE;
 
 pub fn setup(
     mut commands: Commands,
@@ -194,25 +193,22 @@ pub fn home_button_system(
     mut next_gamestate: ResMut<NextState<GameState>>,
     asset_server: Res<AssetServer>,
     audio: Res<Audio>,
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &mut BorderColor),
-        (Changed<Interaction>, With<HomeButton>),
-    >,
+    mut button_query: Query<ButtonQuery, (Changed<Interaction>, With<HomeButton>)>,
 ) {
-    for (interaction, mut color, mut border_color) in &mut interaction_query {
-        match *interaction {
+    for mut button in button_query.iter_mut() {
+        match *button.interaction {
             Interaction::None => {
-                *color = NORMAL_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = NORMAL_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
-                *color = HOVERED_BUTTON.into();
-                border_color.0 = Color::WHITE;
+                *button.color = HOVERED_BUTTON.into();
+                button.border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::Pressed => {
-                *color = PRESSED_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = PRESSED_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
                 next_gamestate.set(GameState::MainMenu);
             }
         }
@@ -223,25 +219,22 @@ pub fn restart_button_system(
     mut next_gamestate: ResMut<NextState<GameState>>,
     asset_server: Res<AssetServer>,
     audio: Res<Audio>,
-    mut interaction_query: Query<
-        (&Interaction, &mut BackgroundColor, &mut BorderColor),
-        (Changed<Interaction>, With<RestartButton>),
-    >,
+    mut button_query: Query<ButtonQuery, (Changed<Interaction>, With<RestartButton>)>,
 ) {
-    for (interaction, mut color, mut border_color) in &mut interaction_query {
-        match *interaction {
+    for mut button in button_query.iter_mut() {
+        match *button.interaction {
             Interaction::None => {
-                *color = NORMAL_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = NORMAL_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
             }
             Interaction::Hovered => {
-                *color = HOVERED_BUTTON.into();
-                border_color.0 = Color::WHITE;
+                *button.color = HOVERED_BUTTON.into();
+                button.border_color.0 = Color::WHITE;
                 audio.play(asset_server.load("sounds/hover_button.ogg"));
             }
             Interaction::Pressed => {
-                *color = PRESSED_BUTTON.into();
-                border_color.0 = Color::BLACK;
+                *button.color = PRESSED_BUTTON.into();
+                button.border_color.0 = Color::BLACK;
                 next_gamestate.set(GameState::InGame);
             }
         }
