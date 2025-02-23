@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_kira_audio::prelude::*;
 
 use crate::ingame::CursorCrosshair;
 use crate::ingame::HitEvent;
@@ -60,27 +59,6 @@ pub fn m4_sprite_animator(
     }
 }
 
-pub fn contact_sprite_animator(
-    mut commands: Commands,
-    time: Res<Time>,
-    mut query: Query<(Entity, &mut AnimationConfig, &mut Sprite), With<ContactSprite>>,
-) {
-    for (entity, mut config, mut sprite) in &mut query {
-        config.frame_timer.tick(time.delta());
-
-        if config.frame_timer.just_finished() {
-            if let Some(atlas) = &mut sprite.texture_atlas {
-                if atlas.index == config.last_sprite_index {
-                    commands.entity(entity).despawn_recursive();
-                } else {
-                    atlas.index += 1;
-                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
-                }
-            }
-        }
-    }
-}
-
 pub fn contact_spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -110,6 +88,27 @@ pub fn contact_spawn(
             ContactSprite,
             animation_config,
         ));
+    }
+}
+
+pub fn contact_sprite_animator(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut AnimationConfig, &mut Sprite), With<ContactSprite>>,
+) {
+    for (entity, mut config, mut sprite) in &mut query {
+        config.frame_timer.tick(time.delta());
+
+        if config.frame_timer.just_finished() {
+            if let Some(atlas) = &mut sprite.texture_atlas {
+                if atlas.index == config.last_sprite_index {
+                    commands.entity(entity).despawn_recursive();
+                } else {
+                    atlas.index += 1;
+                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                }
+            }
+        }
     }
 }
 
@@ -169,20 +168,16 @@ pub fn bullet_case_spawn(
 
 pub fn bullet_case_controller(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    audio: Res<Audio>,
     mut casing: Query<(Entity, &mut Transform, &mut BulletCase)>,
     time: Res<Time>,
 ) {
     for (casing_entity, mut casing_transform, mut casing_timer) in &mut casing {
         casing_timer.lifetime.tick(time.delta());
-        casing_transform.translation.x += 10000.0 * time.delta_secs();
-        casing_transform.translation.y += 1000.0 * time.delta_secs();
+        casing_transform.translation += Vec3::new(10000.0, 1000.0, 0.0) * time.delta_secs();
         casing_transform.rotate_z(-30.0 * time.delta_secs());
 
         if casing_timer.lifetime.finished() {
             commands.entity(casing_entity).despawn();
-            audio.play(asset_server.load("sounds/casing.ogg"));
         }
     }
 }

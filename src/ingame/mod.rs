@@ -3,15 +3,15 @@ use bevy::prelude::*;
 pub mod animations;
 pub mod gameplay;
 pub mod ingame_ui;
-pub mod spawn;
+pub mod setup;
 
 use animations::*;
 use gameplay::*;
 use ingame_ui::*;
-use spawn::*;
+use setup::*;
 
-use crate::despawn_screen;
 use crate::GameState;
+use crate::despawn_screen;
 
 #[derive(Resource)]
 pub struct Scores {
@@ -34,7 +34,7 @@ impl Plugin for InGamePlugin {
                     cursor_position,
                     m4_shooting,
                     m4_firerate_timer,
-                    ball_pause,
+                    enable_ball_physics.before(ball_jump),
                     ball_jump,
                     ball_contact_checker,
                     gameover_controller,

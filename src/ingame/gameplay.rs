@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_kira_audio::prelude::*;
 use rand::random_range;
 
-use super::{Ball, CursorCrosshair, EndGameTimer, Scores, M4};
+use super::{Ball, CursorCrosshair, EndGameTimer, M4, Scores};
 use crate::{GameDifficultyState, GameState};
 
 #[derive(Event)]
@@ -56,11 +56,15 @@ pub fn m4_firerate_timer(mut m4_timer: Single<&mut M4>, time: Res<Time>) {
     }
 }
 
-pub fn ball_pause(mut time: ResMut<Time<Physics>>, scores: Res<Scores>) {
-    if scores.current_score == 0 {
-        time.pause();
-    } else {
-        time.unpause();
+pub fn enable_ball_physics(
+    mut commands: Commands,
+    scores: Res<Scores>,
+    query: Query<Entity, (With<RigidBody>, With<Ball>)>,
+) {
+    if scores.current_score == 1 {
+        for entity in &query {
+            commands.entity(entity).remove::<RigidBodyDisabled>();
+        }
     }
 }
 
@@ -76,11 +80,10 @@ pub fn ball_contact_checker(
 
     for _event in shooting_event_reader.read() {
         for Collision(contacts) in collision_event_reader.read() {
-            info!("ent1 = {}", contacts.entity1);
-            info!("ent2 = {}", contacts.entity2);
+            // info!("ent1 = {}", contacts.entity1);
+            // info!("ent2 = {}", contacts.entity2);
             if contacts.entity1 == ball_entity && contacts.entity2 == cross_entity {
                 hit_event_writer.send(HitEvent);
-                info!("test");
                 break;
             }
         }
