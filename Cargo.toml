@@ -13,7 +13,7 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = { version = "0.15.2", default-features = false, features = [
+bevy = { version = "0.15.3", default-features = false, features = [
     # Default features
     "bevy_animation",     # Provides animation functionality
     "bevy_asset",         # Provides asset functionality

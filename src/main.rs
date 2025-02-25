@@ -22,8 +22,8 @@ use mainmenu::MainMenuPlugin;
 #[derive(Component)]
 pub struct FpsText;
 
-pub const SCREEN_WIDTH: f32 = 1280.0;
-pub const SCREEN_HEIGHT: f32 = 720.0;
+pub const SCREEN_WIDTH: f32 = 1920.0;
+pub const SCREEN_HEIGHT: f32 = 1080.0;
 pub const CUSTOM_FONT: &str = "fonts/NotoSans-Medium.ttf";
 
 #[derive(QueryData)]
@@ -42,6 +42,7 @@ const PRESSED_BUTTON: Color = Color::WHITE;
 pub enum GameState {
     #[default]
     MainMenu,
+    SettingsMenu,
     InGame,
     GameOver,
 }
@@ -61,7 +62,7 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "First Person Hopper".into(),
-                        resolution: (SCREEN_WIDTH, SCREEN_HEIGHT).into(),
+                        resolution: (1280.0, 720.0).into(),
                         resizable: true,
                         mode: WindowMode::Windowed,
                         position: WindowPosition::Centered(MonitorSelection::Primary),
@@ -93,8 +94,8 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Camera2d,
         Projection::Orthographic(OrthographicProjection {
-            scaling_mode: ScalingMode::FixedVertical {
-                viewport_height: 1080.,
+            scaling_mode: ScalingMode::FixedHorizontal {
+                viewport_width: SCREEN_WIDTH,
             },
             ..OrthographicProjection::default_2d()
         }),

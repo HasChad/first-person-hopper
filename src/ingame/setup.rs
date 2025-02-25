@@ -90,7 +90,16 @@ pub fn ingame_setup(
 
     // left wall
     commands.spawn((
-        Sprite::from_image(asset_server.load("sprites/wall.png")),
+        Sprite {
+            image: asset_server.load("sprites/wall.png"),
+            image_mode: SpriteImageMode::Tiled {
+                tile_x: false,
+                tile_y: true,
+                stretch_value: 1.0,
+            },
+            custom_size: Some(Vec2::new(200.0, 10000.0)),
+            ..default()
+        },
         Transform::from_xyz(-SCREEN_WIDTH / 2.0, 0.0, -6.0),
         RigidBody::Static,
         Collider::rectangle(200.0, 100000.0),
@@ -100,7 +109,16 @@ pub fn ingame_setup(
 
     // right wall
     commands.spawn((
-        Sprite::from_image(asset_server.load("sprites/wall.png")),
+        Sprite {
+            image: asset_server.load("sprites/wall.png"),
+            image_mode: SpriteImageMode::Tiled {
+                tile_x: false,
+                tile_y: true,
+                stretch_value: 1.0,
+            },
+            custom_size: Some(Vec2::new(200.0, 10000.0)),
+            ..default()
+        },
         Transform::from_xyz(SCREEN_WIDTH / 2.0, 0.0, -6.0).with_rotation(Quat::from_rotation_y(PI)),
         RigidBody::Static,
         Collider::rectangle(200.0, 100000.0),

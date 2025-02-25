@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
 use crate::{
-    ingame::Scores, ButtonQuery, GameDifficultyState, GameState, CUSTOM_FONT, HOVERED_BUTTON,
-    NORMAL_BUTTON, PRESSED_BUTTON,
+    ButtonQuery, CUSTOM_FONT, GameDifficultyState, GameState, HOVERED_BUTTON, NORMAL_BUTTON,
+    PRESSED_BUTTON, ingame::Scores,
 };
 
 #[derive(Component)]
@@ -45,15 +45,12 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
                     align_items: AlignItems::Center,
                     ..default()
                 })
-                .with_child((
-                    Text::new("FIRST PERSON HOPPER"),
-                    TextFont {
-                        font: asset_server.load(CUSTOM_FONT),
-                        font_size: 100.0,
-                        ..default()
-                    },
-                    TextColor(Color::WHITE),
-                ));
+                .with_child(Sprite {
+                    image: asset_server.load("sprites/title.png"),
+                    image_mode: SpriteImageMode::Auto,
+                    custom_size: Some(Vec2::new(1050.0, 540.0)),
+                    ..default()
+                });
         })
         // button node
         .with_children(|parent| {

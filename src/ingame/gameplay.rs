@@ -19,16 +19,17 @@ pub fn cursor_position(
     windows: Query<&Window>,
 ) {
     let (camera, camera_transform) = *camera_query;
-    let cursor_position = windows.single().cursor_position().unwrap();
-    let Ok(cursor_pos) = camera.viewport_to_world_2d(camera_transform, cursor_position) else {
-        return;
-    };
+    if let Some(cursor_position) = windows.single().cursor_position() {
+        let Ok(cursor_pos) = camera.viewport_to_world_2d(camera_transform, cursor_position) else {
+            return;
+        };
 
-    crosshair_pos.translation.x = cursor_pos.x;
-    crosshair_pos.translation.y = cursor_pos.y;
+        crosshair_pos.translation.x = cursor_pos.x;
+        crosshair_pos.translation.y = cursor_pos.y;
 
-    m4_pos.translation.x = cursor_pos.x + 350.0;
-    m4_pos.translation.y = cursor_pos.y - 400.0;
+        m4_pos.translation.x = cursor_pos.x + 350.0;
+        m4_pos.translation.y = cursor_pos.y - 400.0;
+    }
 }
 
 pub fn m4_shooting(
