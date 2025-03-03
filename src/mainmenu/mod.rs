@@ -2,9 +2,8 @@ use bevy::prelude::*;
 
 mod mainmenu_ui;
 
+use crate::{GameState, despawn_screen};
 use mainmenu_ui::*;
-
-use crate::{despawn_screen, GameState};
 
 pub struct MainMenuPlugin;
 

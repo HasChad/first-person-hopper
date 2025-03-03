@@ -4,11 +4,9 @@ version = "0.2.0"
 edition = "2024"
 authors = ["HasChad"]
 
-# Enable a small amount of optimization in debug mode
 [profile.dev]
 opt-level = 1
 
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
 

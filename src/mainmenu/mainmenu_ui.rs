@@ -25,6 +25,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
     // full screen node
     commands
         .spawn((
+            ImageNode::from(asset_server.load("sprites/menu_background.png")),
             Node {
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),
@@ -37,20 +38,23 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res
         ))
         // title node
         .with_children(|parent| {
+            let title_size = 30. / 100.;
             parent
                 .spawn(Node {
                     height: Val::Percent(50.0),
                     width: Val::Percent(100.0),
                     justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
+                    align_items: AlignItems::End,
                     ..default()
                 })
-                .with_child(Sprite {
-                    image: asset_server.load("sprites/title.png"),
-                    image_mode: SpriteImageMode::Auto,
-                    custom_size: Some(Vec2::new(1050.0, 540.0)),
-                    ..default()
-                });
+                .with_child((
+                    ImageNode::from(asset_server.load("sprites/title.png")),
+                    Node {
+                        width: Val::Px(2018. * title_size),
+                        height: Val::Px(1060. * title_size),
+                        ..default()
+                    },
+                ));
         })
         // button node
         .with_children(|parent| {

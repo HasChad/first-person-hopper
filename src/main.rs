@@ -101,12 +101,6 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         }),
     ));
 
-    // backround art
-    commands.spawn((
-        Sprite::from_image(asset_server.load("sprites/menu_background.png")),
-        Transform::from_xyz(0.0, 0.0, -10.0),
-    ));
-
     // version text
     commands.spawn((
         Text::new("v2.0alpha_test"),
