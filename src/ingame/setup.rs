@@ -137,7 +137,7 @@ pub fn ingame_setup(
                 RigidBodyDisabled,
                 Collider::circle(50.0),
                 Mass(1.0),
-                GravityScale(150.0),
+                GravityScale(120.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,
@@ -159,7 +159,7 @@ pub fn ingame_setup(
                 RigidBodyDisabled,
                 Collider::circle(50.0),
                 Mass(1.0),
-                GravityScale(220.0),
+                GravityScale(300.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,
@@ -180,8 +180,8 @@ pub fn ingame_setup(
                 RigidBody::Dynamic,
                 RigidBodyDisabled,
                 Collider::circle(25.0),
-                Mass(1.1),
-                GravityScale(230.0),
+                Mass(1.2),
+                GravityScale(250.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,

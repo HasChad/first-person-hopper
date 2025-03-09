@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
 use crate::{
-    ingame::Scores, ButtonQuery, GameState, CUSTOM_FONT, HOVERED_BUTTON, NORMAL_BUTTON,
-    PRESSED_BUTTON,
+    ButtonQuery, CUSTOM_FONT, GameState, HOVERED_BUTTON, NORMAL_BUTTON, PRESSED_BUTTON,
+    ingame::Scores,
 };
 
 #[derive(Component)]
@@ -26,6 +26,7 @@ pub fn setup(
     //create full screen node bundle
     commands
         .spawn((
+            ImageNode::from(asset_server.load("sprites/menu_background.png")),
             Node {
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),
@@ -77,7 +78,7 @@ pub fn setup(
                     parent
                         .spawn((
                             Node {
-                                width: Val::Px(550.0),
+                                width: Val::Px(600.0),
                                 height: Val::Px(75.0),
                                 align_items: AlignItems::Center,
                                 justify_content: JustifyContent::Center,
@@ -100,7 +101,7 @@ pub fn setup(
                     parent
                         .spawn((
                             Node {
-                                width: Val::Px(550.0),
+                                width: Val::Px(600.0),
                                 height: Val::Px(75.0),
                                 align_items: AlignItems::Center,
                                 justify_content: JustifyContent::Center,

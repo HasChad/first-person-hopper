@@ -19,12 +19,12 @@ use gameover::GameOverPlugin;
 use ingame::InGamePlugin;
 use mainmenu::MainMenuPlugin;
 
-#[derive(Component)]
-pub struct FpsText;
-
-pub const SCREEN_WIDTH: f32 = 1920.0;
-pub const SCREEN_HEIGHT: f32 = 1080.0;
-pub const CUSTOM_FONT: &str = "fonts/NotoSans-Medium.ttf";
+const SCREEN_WIDTH: f32 = 1920.0;
+const SCREEN_HEIGHT: f32 = 1080.0;
+const CUSTOM_FONT: &str = "fonts/NotoSans-Medium.ttf";
+const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
+const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
+const PRESSED_BUTTON: Color = Color::WHITE;
 
 #[derive(QueryData)]
 #[query_data(mutable)]
@@ -34,9 +34,8 @@ pub struct ButtonQuery {
     border_color: &'static mut BorderColor,
 }
 
-const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
-const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
-const PRESSED_BUTTON: Color = Color::WHITE;
+#[derive(Component)]
+pub struct FpsText;
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 pub enum GameState {

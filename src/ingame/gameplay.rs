@@ -72,6 +72,7 @@ pub fn enable_ball_physics(
 pub fn ball_contact_checker(
     ball: Query<Entity, With<Ball>>,
     crosshair: Query<Entity, With<CursorCrosshair>>,
+    mut scores: ResMut<Scores>,
     mut hit_event_writer: EventWriter<HitEvent>,
     mut shooting_event_reader: EventReader<ShootingEvent>,
     mut collision_event_reader: EventReader<Collision>,
@@ -85,6 +86,8 @@ pub fn ball_contact_checker(
             // info!("ent2 = {}", contacts.entity2);
             if contacts.entity1 == ball_entity && contacts.entity2 == cross_entity {
                 hit_event_writer.send(HitEvent);
+                scores.current_score += 1;
+
                 break;
             }
         }
@@ -92,7 +95,6 @@ pub fn ball_contact_checker(
 }
 
 pub fn ball_jump(
-    mut scores: ResMut<Scores>,
     mut ball: Query<
         (
             &mut LinearVelocity,
@@ -106,13 +108,12 @@ pub fn ball_jump(
 ) {
     for _event in event_reader.read() {
         for (mut ball_vel, mut ball_ang_vel, mut ball_imp, mut ball_ang_imp) in &mut ball {
-            scores.current_score += 1;
-
             ball_vel.0 = Vec2::ZERO;
             ball_ang_vel.0 = 0.0;
             ball_imp.apply_impulse(Vec2::new(
                 random_range(-400.0..400.0),
-                random_range(700.0..1000.0),
+                700.0,
+                //random_range(700.0..1000.0),
             ));
             ball_ang_imp.apply_impulse(random_range(-5000.0..5000.0));
         }
