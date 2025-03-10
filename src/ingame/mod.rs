@@ -34,13 +34,12 @@ impl Plugin for InGamePlugin {
                     cursor_position,
                     m4_shooting,
                     m4_firerate_timer,
-                    enable_ball_physics.before(ball_jump),
+                    enable_ball_physics,
                     ball_jump,
                     ball_contact_checker,
                     gameover_controller,
-                    score_saver,
                     // animation
-                    m4_sprite_animator,
+                    gun_sprite_animator,
                     contact_spawn,
                     contact_sprite_animator,
                     bullet_case_spawn,
@@ -50,7 +49,10 @@ impl Plugin for InGamePlugin {
                 )
                     .run_if(in_state(GameState::InGame)),
             )
-            .add_systems(OnExit(GameState::InGame), despawn_screen::<InGameEntity>)
+            .add_systems(
+                OnExit(GameState::InGame),
+                (score_saver, despawn_screen::<InGameEntity>),
+            )
             .add_event::<HitEvent>()
             .add_event::<ShootingEvent>()
             .insert_resource(Scores {

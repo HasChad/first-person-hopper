@@ -16,7 +16,7 @@ pub struct CursorCrosshair;
 pub struct Ball;
 
 #[derive(Component)]
-pub struct M4 {
+pub struct Gun {
     pub lifetime: Timer,
     pub okay_to_shoot: bool,
 }
@@ -36,8 +36,8 @@ pub fn ingame_setup(
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     scores.current_score = 0;
-
-    audio.play(asset_server.load("sounds/start.ogg"));
+    audio.stop();
+    audio.play(asset_server.load("sounds/gun_ready.ogg"));
 
     // lock and hide crosshair
     //window.cursor_options.visible = false;
@@ -58,21 +58,22 @@ pub fn ingame_setup(
         InGameEntity,
     ));
 
-    // spawn m4 with animation props
+    // spawn gun with animation props
+    let gun_image: Handle<Image> = asset_server.load("sprites/gun_sheet.png");
     let layout = TextureAtlasLayout::from_grid(UVec2::new(1550, 720), 5, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_config = AnimationConfig::new(0, 4, 30);
 
     commands.spawn((
         Sprite::from_atlas_image(
-            asset_server.load("sprites/m4_sheet.png"),
+            gun_image,
             TextureAtlas {
                 layout: texture_atlas_layout,
                 index: animation_config.first_sprite_index,
             },
         ),
         animation_config,
-        M4 {
+        Gun {
             lifetime: Timer::from_seconds(0.2, TimerMode::Once),
             okay_to_shoot: true,
         },
@@ -137,7 +138,7 @@ pub fn ingame_setup(
                 RigidBodyDisabled,
                 Collider::circle(50.0),
                 Mass(1.0),
-                GravityScale(120.0),
+                GravityScale(200.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,
@@ -181,7 +182,7 @@ pub fn ingame_setup(
                 RigidBodyDisabled,
                 Collider::circle(25.0),
                 Mass(1.2),
-                GravityScale(250.0),
+                GravityScale(300.0),
                 Restitution {
                     coefficient: 1.0,
                     combine_rule: CoefficientCombine::Average,

@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_kira_audio::prelude::*;
 use rand::random_range;
 
-use super::{Ball, CursorCrosshair, EndGameTimer, M4, Scores};
+use super::{Ball, CursorCrosshair, EndGameTimer, Gun, Scores};
 use crate::{GameDifficultyState, GameState};
 
 #[derive(Event)]
@@ -14,7 +14,7 @@ pub struct HitEvent;
 
 pub fn cursor_position(
     mut crosshair_pos: Single<&mut Transform, With<CursorCrosshair>>,
-    mut m4_pos: Single<&mut Transform, (With<M4>, Without<CursorCrosshair>)>,
+    mut m4_pos: Single<&mut Transform, (With<Gun>, Without<CursorCrosshair>)>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
     windows: Query<&Window>,
 ) {
@@ -35,18 +35,18 @@ pub fn cursor_position(
 pub fn m4_shooting(
     audio: Res<Audio>,
     asset_server: Res<AssetServer>,
-    mut m4_props: Single<&mut M4>,
+    mut m4_props: Single<&mut Gun>,
     mouse_input: Res<ButtonInput<MouseButton>>,
     mut shooting_event_writer: EventWriter<ShootingEvent>,
 ) {
     if mouse_input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
         m4_props.okay_to_shoot = false;
-        audio.play(asset_server.load("sounds/M4.ogg"));
+        audio.play(asset_server.load("sounds/gun_shot.ogg"));
         shooting_event_writer.send(ShootingEvent);
     }
 }
 
-pub fn m4_firerate_timer(mut m4_timer: Single<&mut M4>, time: Res<Time>) {
+pub fn m4_firerate_timer(mut m4_timer: Single<&mut Gun>, time: Res<Time>) {
     if !m4_timer.okay_to_shoot {
         m4_timer.lifetime.tick(time.delta());
 
@@ -111,9 +111,8 @@ pub fn ball_jump(
             ball_vel.0 = Vec2::ZERO;
             ball_ang_vel.0 = 0.0;
             ball_imp.apply_impulse(Vec2::new(
-                random_range(-400.0..400.0),
-                700.0,
-                //random_range(700.0..1000.0),
+                random_range(-600.0..600.0),
+                random_range(700.0..1200.0),
             ));
             ball_ang_imp.apply_impulse(random_range(-5000.0..5000.0));
         }

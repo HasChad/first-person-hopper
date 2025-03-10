@@ -3,8 +3,8 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 use crate::ingame::CursorCrosshair;
+use crate::ingame::Gun;
 use crate::ingame::HitEvent;
-use crate::ingame::M4;
 
 use super::ShootingEvent;
 
@@ -39,9 +39,9 @@ impl AnimationConfig {
     }
 }
 
-pub fn m4_sprite_animator(
+pub fn gun_sprite_animator(
     time: Res<Time>,
-    mut query: Query<(&mut AnimationConfig, &mut Sprite), With<M4>>,
+    mut query: Query<(&mut AnimationConfig, &mut Sprite), With<Gun>>,
 ) {
     for (mut config, mut sprite) in &mut query {
         config.frame_timer.tick(time.delta());
@@ -118,10 +118,10 @@ pub fn fire_spawn(
     asset_server: Res<AssetServer>,
     mut textures: ResMut<Assets<TextureAtlas>>,
     cursor_pos: Query<&Transform, With<CursorCrosshair>>,
-    m4_pos: Query<&Transform, With<M4>>,
-    mut m4_event_reader: EventReader<M4AnimationEvent>,
+    gun_pos: Query<&Transform, With<GUN>>,
+    mut gun_event_reader: EventReader<GUNAnimationEvent>,
 ) {
-    for _event in m4_event_reader.iter() {
+    for _event in gun_event_reader.iter() {
         commands
             .spawn((SpriteSheetBundle {
                 texture_atlas: textures.add(TextureAtlas::from_grid(
@@ -152,13 +152,13 @@ pub fn fire_spawn(
 pub fn bullet_case_spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    m4_pos: Single<&Transform, With<M4>>,
+    gun_pos: Single<&Transform, With<Gun>>,
     mut shooting_event_reader: EventReader<ShootingEvent>,
 ) {
     for _event in shooting_event_reader.read() {
         commands.spawn((
             Sprite::from_image(asset_server.load("sprites/bullet_case.png")),
-            Transform::from_xyz(m4_pos.translation.x, m4_pos.translation.y + 200.0, -1.0),
+            Transform::from_xyz(gun_pos.translation.x, gun_pos.translation.y + 200.0, -1.0),
             BulletCase {
                 lifetime: Timer::from_seconds(0.5, TimerMode::Once),
             },

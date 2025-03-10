@@ -110,7 +110,7 @@ pub fn setup(
                             BackgroundColor(Color::BLACK),
                         ))
                         .with_child((
-                            Text::new(format!("HIGH SCORE: {}", scores.current_score)),
+                            Text::new(format!("HIGH SCORE: {}", scores.high_score)),
                             TextFont {
                                 font: asset_server.load(CUSTOM_FONT),
                                 font_size: 70.0,

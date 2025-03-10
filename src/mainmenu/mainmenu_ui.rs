@@ -21,7 +21,14 @@ pub struct QuitButton;
 #[derive(Component)]
 pub struct MainMenuEntity;
 
-pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>, scores: Res<Scores>) {
+pub fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
+    scores: Res<Scores>,
+) {
+    audio.play(asset_server.load("sounds/main_menu.ogg"));
+
     // full screen node
     commands
         .spawn((
