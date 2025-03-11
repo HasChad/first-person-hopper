@@ -1,4 +1,4 @@
-// #![windows_subsystem = "windows"] //to disable console
+// #![windows_subsystem = "windows"] //disable console on windows
 
 use avian2d::prelude::*;
 use bevy::{

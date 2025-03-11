@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::CursorGrabMode};
 use bevy_kira_audio::prelude::*;
 use rand::random_range;
 
-use super::{Ball, CursorCrosshair, EndGameTimer, Gun, Scores};
+use super::{Ball, CursorCrosshair, EndGameTimer, Gun, Scores, animations::AnimationConfig};
 use crate::{GameDifficultyState, GameState};
 
 #[derive(Event)]
@@ -14,7 +14,7 @@ pub struct HitEvent;
 
 pub fn cursor_position(
     mut crosshair_pos: Single<&mut Transform, With<CursorCrosshair>>,
-    mut m4_pos: Single<&mut Transform, (With<Gun>, Without<CursorCrosshair>)>,
+    mut gun_pos: Single<&mut Transform, (With<Gun>, Without<CursorCrosshair>)>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
     windows: Query<&Window>,
 ) {
@@ -27,32 +27,36 @@ pub fn cursor_position(
         crosshair_pos.translation.x = cursor_pos.x;
         crosshair_pos.translation.y = cursor_pos.y;
 
-        m4_pos.translation.x = cursor_pos.x + 350.0;
-        m4_pos.translation.y = cursor_pos.y - 400.0;
+        gun_pos.translation.x = cursor_pos.x + 350.0;
+        gun_pos.translation.y = cursor_pos.y - 400.0;
     }
 }
 
-pub fn m4_shooting(
+pub fn gun_shooting(
     audio: Res<Audio>,
     asset_server: Res<AssetServer>,
-    mut m4_props: Single<&mut Gun>,
+    mut gun_props: Query<(&mut Gun, &mut AnimationConfig)>,
     mouse_input: Res<ButtonInput<MouseButton>>,
     mut shooting_event_writer: EventWriter<ShootingEvent>,
 ) {
-    if mouse_input.just_pressed(MouseButton::Left) && m4_props.okay_to_shoot {
-        m4_props.okay_to_shoot = false;
-        audio.play(asset_server.load("sounds/gun_shot.ogg"));
-        shooting_event_writer.send(ShootingEvent);
+    for (mut gun_prop, mut anim_config) in gun_props.iter_mut() {
+        if mouse_input.just_pressed(MouseButton::Left) && gun_prop.okay_to_shoot {
+            gun_prop.okay_to_shoot = false;
+            audio.play(asset_server.load("sounds/gun_shot.ogg"));
+            shooting_event_writer.send(ShootingEvent);
+
+            anim_config.anim_config.play = true;
+        }
     }
 }
 
-pub fn m4_firerate_timer(mut m4_timer: Single<&mut Gun>, time: Res<Time>) {
-    if !m4_timer.okay_to_shoot {
-        m4_timer.lifetime.tick(time.delta());
+pub fn gun_firerate_timer(mut gun_timer: Single<&mut Gun>, time: Res<Time>) {
+    if !gun_timer.okay_to_shoot {
+        gun_timer.lifetime.tick(time.delta());
 
-        if m4_timer.lifetime.finished() {
-            m4_timer.okay_to_shoot = true;
-            m4_timer.lifetime.reset();
+        if gun_timer.lifetime.finished() {
+            gun_timer.okay_to_shoot = true;
+            gun_timer.lifetime.reset();
         }
     }
 }

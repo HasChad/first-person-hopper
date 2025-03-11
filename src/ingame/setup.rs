@@ -62,7 +62,7 @@ pub fn ingame_setup(
     let gun_image: Handle<Image> = asset_server.load("sprites/gun_sheet.png");
     let layout = TextureAtlasLayout::from_grid(UVec2::new(1550, 720), 5, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let animation_config = AnimationConfig::new(0, 4, 30);
+    let animation_config = AnimationConfig::new(0, 4, 30, false);
 
     commands.spawn((
         Sprite::from_atlas_image(
@@ -74,7 +74,7 @@ pub fn ingame_setup(
         ),
         animation_config,
         Gun {
-            lifetime: Timer::from_seconds(0.2, TimerMode::Once),
+            lifetime: Timer::from_seconds(0.1, TimerMode::Once),
             okay_to_shoot: true,
         },
         InGameEntity,

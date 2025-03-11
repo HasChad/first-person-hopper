@@ -32,16 +32,15 @@ impl Plugin for InGamePlugin {
                 (
                     // gameplay
                     cursor_position,
-                    m4_shooting,
-                    m4_firerate_timer,
+                    gun_shooting,
+                    gun_firerate_timer,
                     enable_ball_physics,
                     ball_jump,
                     ball_contact_checker,
                     gameover_controller,
                     // animation
-                    gun_sprite_animator,
+                    sprite_animator,
                     contact_spawn,
-                    contact_sprite_animator,
                     bullet_case_spawn,
                     bullet_case_controller,
                     // ui

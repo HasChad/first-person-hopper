@@ -21,15 +21,17 @@ pub struct AnimationConfig {
     pub first_sprite_index: usize,
     pub last_sprite_index: usize,
     pub fps: u8,
+    pub play: bool,
     frame_timer: Timer,
 }
 
 impl AnimationConfig {
-    pub fn new(first: usize, last: usize, fps: u8) -> Self {
+    pub fn new(first: usize, last: usize, fps: u8, play: bool) -> Self {
         Self {
             first_sprite_index: first,
             last_sprite_index: last,
             fps,
+            play,
             frame_timer: Self::timer_from_fps(fps),
         }
     }
@@ -39,20 +41,21 @@ impl AnimationConfig {
     }
 }
 
-pub fn gun_sprite_animator(
-    time: Res<Time>,
-    mut query: Query<(&mut AnimationConfig, &mut Sprite), With<Gun>>,
-) {
+pub fn sprite_animator(time: Res<Time>, mut query: Query<(&mut AnimationConfig, &mut Sprite)>) {
     for (mut config, mut sprite) in &mut query {
-        config.frame_timer.tick(time.delta());
+        if config.play {
+            config.frame_timer.tick(time.delta());
 
-        if config.frame_timer.just_finished() {
-            if let Some(atlas) = &mut sprite.texture_atlas {
-                if atlas.index == config.last_sprite_index {
-                    atlas.index = config.first_sprite_index;
-                } else {
-                    atlas.index += 1;
-                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+            if config.frame_timer.just_finished() {
+                if let Some(atlas) = &mut sprite.texture_atlas {
+                    if atlas.index == config.last_sprite_index {
+                        atlas.index = config.first_sprite_index;
+                        config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                        config.play = false;
+                    } else {
+                        atlas.index += 1;
+                        config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
+                    }
                 }
             }
         }
@@ -69,7 +72,7 @@ pub fn contact_spawn(
     for _event in contact_event_reader.read() {
         let layout = TextureAtlasLayout::from_grid(UVec2::splat(48), 5, 1, None, None);
         let texture_atlas_layout = texture_atlas_layouts.add(layout);
-        let animation_config = AnimationConfig::new(0, 4, 30);
+        let animation_config = AnimationConfig::new(0, 4, 50, true);
 
         commands.spawn((
             Sprite {
@@ -88,27 +91,6 @@ pub fn contact_spawn(
             ContactSprite,
             animation_config,
         ));
-    }
-}
-
-pub fn contact_sprite_animator(
-    mut commands: Commands,
-    time: Res<Time>,
-    mut query: Query<(Entity, &mut AnimationConfig, &mut Sprite), With<ContactSprite>>,
-) {
-    for (entity, mut config, mut sprite) in &mut query {
-        config.frame_timer.tick(time.delta());
-
-        if config.frame_timer.just_finished() {
-            if let Some(atlas) = &mut sprite.texture_atlas {
-                if atlas.index == config.last_sprite_index {
-                    commands.entity(entity).despawn_recursive();
-                } else {
-                    atlas.index += 1;
-                    config.frame_timer = AnimationConfig::timer_from_fps(config.fps);
-                }
-            }
-        }
     }
 }
 
