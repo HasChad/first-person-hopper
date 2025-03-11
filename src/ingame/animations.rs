@@ -14,6 +14,11 @@ pub struct BulletCase {
 }
 
 #[derive(Component)]
+pub struct MuzzleFlash {
+    lifetime: Timer,
+}
+
+#[derive(Component)]
 pub struct ContactSprite;
 
 #[derive(Component)]
@@ -145,6 +150,18 @@ pub fn bullet_case_spawn(
                 lifetime: Timer::from_seconds(0.5, TimerMode::Once),
             },
         ));
+
+        commands.spawn((
+            Sprite::from_image(asset_server.load("sprites/muzzle_flash.png")),
+            Transform::from_xyz(
+                gun_pos.translation.x - 120.0,
+                gun_pos.translation.y + 180.0,
+                -1.0,
+            ),
+            MuzzleFlash {
+                lifetime: Timer::from_seconds(0.1, TimerMode::Once),
+            },
+        ));
     }
 }
 
@@ -155,8 +172,25 @@ pub fn bullet_case_controller(
 ) {
     for (casing_entity, mut casing_transform, mut casing_timer) in &mut casing {
         casing_timer.lifetime.tick(time.delta());
-        casing_transform.translation += Vec3::new(10000.0, 1000.0, 0.0) * time.delta_secs();
+        casing_transform.translation += Vec3::new(5000.0, 1000.0, 0.0) * time.delta_secs();
         casing_transform.rotate_z(-30.0 * time.delta_secs());
+
+        if casing_timer.lifetime.finished() {
+            commands.entity(casing_entity).despawn();
+        }
+    }
+}
+
+pub fn muzzle_flash_controller(
+    mut commands: Commands,
+    mut casing: Query<(Entity, &mut Sprite, &mut MuzzleFlash)>,
+    time: Res<Time>,
+) {
+    for (casing_entity, mut casing_sprite, mut casing_timer) in &mut casing {
+        casing_timer.lifetime.tick(time.delta());
+
+        casing_sprite.color =
+            Color::srgba(1.0, 1.0, 1.0, casing_timer.lifetime.remaining_secs() / 0.1);
 
         if casing_timer.lifetime.finished() {
             commands.entity(casing_entity).despawn();

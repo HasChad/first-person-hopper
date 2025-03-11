@@ -27,8 +27,8 @@ pub fn cursor_position(
         crosshair_pos.translation.x = cursor_pos.x;
         crosshair_pos.translation.y = cursor_pos.y;
 
-        gun_pos.translation.x = cursor_pos.x + 350.0;
-        gun_pos.translation.y = cursor_pos.y - 400.0;
+        gun_pos.translation.x = cursor_pos.x + 250.0;
+        gun_pos.translation.y = cursor_pos.y - 250.0;
     }
 }
 
@@ -45,7 +45,7 @@ pub fn gun_shooting(
             audio.play(asset_server.load("sounds/gun_shot.ogg"));
             shooting_event_writer.send(ShootingEvent);
 
-            anim_config.anim_config.play = true;
+            anim_config.play = true;
         }
     }
 }

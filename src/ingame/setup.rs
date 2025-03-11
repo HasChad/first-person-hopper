@@ -60,9 +60,9 @@ pub fn ingame_setup(
 
     // spawn gun with animation props
     let gun_image: Handle<Image> = asset_server.load("sprites/gun_sheet.png");
-    let layout = TextureAtlasLayout::from_grid(UVec2::new(1550, 720), 5, 1, None, None);
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(379, 459), 5, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let animation_config = AnimationConfig::new(0, 4, 30, false);
+    let animation_config = AnimationConfig::new(0, 4, 45, false);
 
     commands.spawn((
         Sprite::from_atlas_image(

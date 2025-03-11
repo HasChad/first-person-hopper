@@ -43,6 +43,7 @@ impl Plugin for InGamePlugin {
                     contact_spawn,
                     bullet_case_spawn,
                     bullet_case_controller,
+                    muzzle_flash_controller,
                     // ui
                     score_text_updater,
                 )
