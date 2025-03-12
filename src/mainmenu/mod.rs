@@ -17,7 +17,8 @@ impl Plugin for MainMenuPlugin {
                     normal_button_system,
                     hard_button_system,
                     quit_button_system,
-                ),
+                )
+                    .run_if(in_state(GameState::MainMenu)),
             )
             .add_systems(
                 OnExit(GameState::MainMenu),

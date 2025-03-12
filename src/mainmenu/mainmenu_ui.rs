@@ -45,7 +45,8 @@ pub fn setup(
         ))
         // title node
         .with_children(|parent| {
-            let title_size = 30. / 100.;
+            let title_size = 60. / 100.;
+
             parent
                 .spawn(Node {
                     height: Val::Percent(50.0),
@@ -57,8 +58,8 @@ pub fn setup(
                 .with_child((
                     ImageNode::from(asset_server.load("sprites/title.png")),
                     Node {
-                        width: Val::Px(2018. * title_size),
-                        height: Val::Px(1060. * title_size),
+                        width: Val::Px(709. * title_size),
+                        height: Val::Px(539. * title_size),
                         ..default()
                     },
                 ));
@@ -273,11 +274,16 @@ pub fn hard_button_system(
 }
 
 pub fn quit_button_system(
+    audio: Res<Audio>,
     mut app_exit_events: ResMut<Events<bevy::app::AppExit>>,
     asset_server: Res<AssetServer>,
-    audio: Res<Audio>,
+    key_input: Res<ButtonInput<KeyCode>>,
     mut button_query: Query<ButtonQuery, (Changed<Interaction>, With<QuitButton>)>,
 ) {
+    if key_input.just_pressed(KeyCode::Escape) {
+        app_exit_events.send(AppExit::Success);
+    }
+
     for mut button in button_query.iter_mut() {
         match *button.interaction {
             Interaction::None => {

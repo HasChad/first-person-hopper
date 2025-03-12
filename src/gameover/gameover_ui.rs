@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{input::keyboard::KeyboardInput, prelude::*};
 use bevy_kira_audio::prelude::*;
 
 use crate::{
@@ -239,5 +239,16 @@ pub fn restart_button_system(
                 next_gamestate.set(GameState::InGame);
             }
         }
+    }
+}
+
+pub fn fast_menu(
+    key_input: Res<ButtonInput<KeyCode>>,
+    mut next_gamestate: ResMut<NextState<GameState>>,
+) {
+    if key_input.just_pressed(KeyCode::KeyR) {
+        next_gamestate.set(GameState::InGame);
+    } else if key_input.just_pressed(KeyCode::Escape) {
+        next_gamestate.set(GameState::MainMenu);
     }
 }
