@@ -27,7 +27,7 @@ pub fn setup(
     audio: Res<Audio>,
     scores: Res<Scores>,
 ) {
-    audio.play(asset_server.load("sounds/main_menu.ogg"));
+    // audio.play(asset_server.load("sounds/main_menu.ogg"));
 
     // full screen node
     commands

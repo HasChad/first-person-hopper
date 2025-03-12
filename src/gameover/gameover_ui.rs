@@ -67,7 +67,7 @@ pub fn setup(
                             Text::new("GAME OVER"),
                             TextFont {
                                 font: asset_server.load(CUSTOM_FONT),
-                                font_size: 120.0,
+                                font_size: 100.0,
                                 ..default()
                             },
                             TextColor(Color::BLACK),

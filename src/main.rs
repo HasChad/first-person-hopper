@@ -21,7 +21,7 @@ use mainmenu::MainMenuPlugin;
 
 const SCREEN_WIDTH: f32 = 1920.0;
 // const SCREEN_HEIGHT: f32 = 1080.0;
-const CUSTOM_FONT: &str = "fonts/NotoSans-Medium.ttf";
+const CUSTOM_FONT: &str = "fonts/Gunplay.ttf";
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::WHITE;
@@ -73,7 +73,7 @@ fn main() {
         //plugins
         .add_plugins(AudioPlugin)
         .add_plugins(PhysicsPlugins::default())
-        .add_plugins(PhysicsDebugPlugin::default())
+        //.add_plugins(PhysicsDebugPlugin::default())
         .add_plugins(FrameTimeDiagnosticsPlugin)
         //systems
         .add_systems(Startup, setup)
