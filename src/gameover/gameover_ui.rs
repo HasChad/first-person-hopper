@@ -1,4 +1,4 @@
-use bevy::{input::keyboard::KeyboardInput, prelude::*};
+use bevy::prelude::*;
 use bevy_kira_audio::prelude::*;
 
 use crate::{
@@ -23,10 +23,16 @@ pub fn setup(
 ) {
     audio.play(asset_server.load("sounds/gameover_sound.ogg"));
 
+    // background spawn
+    commands.spawn((
+        Sprite::from_image(asset_server.load("sprites/menu_background.png")),
+        Transform::from_xyz(0.0, 0.0, -9.0),
+        GameOverEntity,
+    ));
+
     //create full screen node bundle
     commands
         .spawn((
-            ImageNode::from(asset_server.load("sprites/menu_background.png")),
             Node {
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),

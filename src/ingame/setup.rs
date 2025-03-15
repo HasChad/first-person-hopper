@@ -40,8 +40,8 @@ pub fn ingame_setup(
     audio.play(asset_server.load("sounds/gun_ready.ogg"));
 
     // lock and hide crosshair
-    // window.cursor_options.grab_mode = CursorGrabMode::Confined;
-    window.cursor_options.visible = false;
+    window.cursor_options.grab_mode = CursorGrabMode::Confined;
+    // window.cursor_options.visible = false;
 
     // end game timer creation
     commands.spawn((
