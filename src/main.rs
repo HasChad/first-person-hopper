@@ -74,7 +74,7 @@ fn main() {
         .add_plugins(AudioPlugin)
         .add_plugins(PhysicsPlugins::default())
         //.add_plugins(PhysicsDebugPlugin::default())
-        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
         //systems
         .add_systems(Startup, setup)
         .add_systems(Update, fps_text_updater)
@@ -158,6 +158,6 @@ pub fn fps_text_updater(
 // Generic system that takes a component as a parameter, and will despawn all entities with that component
 fn despawn_screen<T: Component>(to_despawn: Query<Entity, With<T>>, mut commands: Commands) {
     for entity in &to_despawn {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }

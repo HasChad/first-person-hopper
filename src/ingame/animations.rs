@@ -7,6 +7,7 @@ use crate::ingame::Gun;
 use crate::ingame::HitEvent;
 
 use super::ShootingEvent;
+use super::setup::InGameEntity;
 
 #[derive(Component)]
 pub struct BulletCase {
@@ -71,7 +72,7 @@ pub fn contact_spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut contact_event_reader: EventReader<HitEvent>,
-    cursor_pos: Query<&Transform, With<CursorCrosshair>>,
+    cursor_pos: Single<&Transform, With<CursorCrosshair>>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     for _event in contact_event_reader.read() {
@@ -88,11 +89,7 @@ pub fn contact_spawn(
                 }),
                 ..default()
             },
-            Transform::from_xyz(
-                cursor_pos.single().translation.x,
-                cursor_pos.single().translation.y,
-                -2.0,
-            ),
+            Transform::from_xyz(cursor_pos.translation.x, cursor_pos.translation.y, -2.0),
             ContactSprite,
             animation_config,
         ));
@@ -144,6 +141,7 @@ pub fn bullet_case_spawn(
 ) {
     for _event in shooting_event_reader.read() {
         commands.spawn((
+            InGameEntity,
             Sprite::from_image(asset_server.load("sprites/bullet_case.png")),
             Transform::from_xyz(gun_pos.translation.x, gun_pos.translation.y + 200.0, -1.0),
             BulletCase {
@@ -152,6 +150,7 @@ pub fn bullet_case_spawn(
         ));
 
         commands.spawn((
+            InGameEntity,
             Sprite::from_image(asset_server.load("sprites/muzzle_flash.png")),
             Transform::from_xyz(
                 gun_pos.translation.x - 120.0,
