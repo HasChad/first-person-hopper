@@ -83,8 +83,6 @@ pub fn ingame_setup(
     // crosshair
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/crosshair.png")),
-        Collider::circle(5.0),
-        Sensor,
         CursorCrosshair,
         InGameEntity,
     ));

@@ -80,15 +80,24 @@ pub fn enable_ball_physics(
 
 pub fn ball_contact_checker(
     ball_entity: Single<Entity, With<Ball>>,
-    cross_entity: Single<Entity, With<CursorCrosshair>>,
     mut scores: ResMut<Scores>,
     mut hit_event_writer: EventWriter<HitEvent>,
     mut shooting_event_reader: EventReader<ShootingEvent>,
-    collisions: Collisions,
+    spatial_query: SpatialQuery,
+    cross_pos: Single<&Transform, With<CursorCrosshair>>,
 ) {
     for _event in shooting_event_reader.read() {
-        for contacts in collisions.iter() {
-            if contacts.entity1 == *ball_entity && contacts.entity2 == *cross_entity {
+        let intersections = spatial_query.point_intersections(
+            Vec2 {
+                x: cross_pos.translation.x,
+                y: cross_pos.translation.y,
+            },
+            &SpatialQueryFilter::default(),
+        );
+
+        for entity in intersections.iter() {
+            if *entity == *ball_entity {
+                info!("nice");
                 hit_event_writer.write(HitEvent);
                 scores.current_score += 1;
             }
