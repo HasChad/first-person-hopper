@@ -73,7 +73,7 @@ fn main() {
         //plugins
         .add_plugins(AudioPlugin)
         .add_plugins(PhysicsPlugins::default())
-        .add_plugins(PhysicsDebugPlugin::default())
+        //.add_plugins(PhysicsDebugPlugin::default())
         .add_plugins(FrameTimeDiagnosticsPlugin::default())
         //systems
         .add_systems(Startup, setup)

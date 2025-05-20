@@ -88,16 +88,12 @@ pub fn ball_contact_checker(
 ) {
     for _event in shooting_event_reader.read() {
         let intersections = spatial_query.point_intersections(
-            Vec2 {
-                x: cross_pos.translation.x,
-                y: cross_pos.translation.y,
-            },
+            cross_pos.translation.truncate(),
             &SpatialQueryFilter::default(),
         );
 
         for entity in intersections.iter() {
             if *entity == *ball_entity {
-                info!("nice");
                 hit_event_writer.write(HitEvent);
                 scores.current_score += 1;
             }
@@ -137,7 +133,7 @@ pub fn gameover_controller(
     mut window: Single<&mut Window>,
     mut next_gamestate: ResMut<NextState<GameState>>,
 ) {
-    if ball.translation.y < -420.0 {
+    if ball.translation.y < -540.0 {
         end_game_timer.lifetime.tick(time.delta());
 
         if end_game_timer.lifetime.finished() {
