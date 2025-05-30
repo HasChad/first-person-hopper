@@ -1,9 +1,9 @@
 use avian2d::prelude::*;
-use bevy::{prelude::*, window::CursorGrabMode};
+use bevy::{prelude::*, window::CursorGrabMode, winit::cursor::CursorIcon};
 use bevy_kira_audio::prelude::*;
 use rand::random_range;
 
-use super::{Ball, CursorCrosshair, EndGameTimer, Gun, Scores, animations::AnimationConfig};
+use super::{Ball, EndGameTimer, Gun, Scores, animations::AnimationConfig};
 use crate::{GameDifficultyState, GameState};
 
 #[derive(Event)]
@@ -13,28 +13,18 @@ pub struct ShootingEvent;
 pub struct HitEvent;
 
 pub fn cursor_position(
-    mut crosshair_pos: Single<&mut Transform, With<CursorCrosshair>>,
-    mut gun_pos: Single<&mut Transform, (With<Gun>, Without<CursorCrosshair>)>,
+    window: Single<&Window>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
-    window: Query<&Window>,
+    mut gun_pos: Single<&mut Transform, With<Gun>>,
 ) {
     let (camera, camera_transform) = *camera_query;
+    let cursor_position = window.cursor_position().unwrap();
+    let cursor_pos = camera
+        .viewport_to_world_2d(camera_transform, cursor_position)
+        .unwrap();
 
-    if let Ok(window) = window.single() {
-        let Some(cursor_position) = window.cursor_position() else {
-            return;
-        };
-
-        let Ok(cursor_pos) = camera.viewport_to_world_2d(camera_transform, cursor_position) else {
-            return;
-        };
-
-        crosshair_pos.translation.x = cursor_pos.x;
-        crosshair_pos.translation.y = cursor_pos.y;
-
-        gun_pos.translation.x = cursor_pos.x + 250.0;
-        gun_pos.translation.y = cursor_pos.y - 250.0;
-    }
+    gun_pos.translation.x = cursor_pos.x + 250.0;
+    gun_pos.translation.y = cursor_pos.y - 250.0;
 }
 
 pub fn gun_shooting(
@@ -79,18 +69,23 @@ pub fn enable_ball_physics(
 }
 
 pub fn ball_contact_checker(
+    window: Single<&Window>,
+    camera_query: Single<(&Camera, &GlobalTransform)>,
     ball_entity: Single<Entity, With<Ball>>,
     mut scores: ResMut<Scores>,
     mut hit_event_writer: EventWriter<HitEvent>,
     mut shooting_event_reader: EventReader<ShootingEvent>,
     spatial_query: SpatialQuery,
-    cross_pos: Single<&Transform, With<CursorCrosshair>>,
 ) {
     for _event in shooting_event_reader.read() {
-        let intersections = spatial_query.point_intersections(
-            cross_pos.translation.truncate(),
-            &SpatialQueryFilter::default(),
-        );
+        let (camera, camera_transform) = *camera_query;
+        let cursor_position = window.cursor_position().unwrap();
+        let cursor_pos = camera
+            .viewport_to_world_2d(camera_transform, cursor_position)
+            .unwrap();
+
+        let intersections =
+            spatial_query.point_intersections(cursor_pos, &SpatialQueryFilter::default());
 
         for entity in intersections.iter() {
             if *entity == *ball_entity {
@@ -131,14 +126,18 @@ pub fn gameover_controller(
     mut end_game_timer: Single<&mut EndGameTimer>,
     ball: Single<&Transform, With<Ball>>,
     mut window: Single<&mut Window>,
+    mut commands: Commands,
+    window_entity: Single<Entity, With<Window>>,
     mut next_gamestate: ResMut<NextState<GameState>>,
 ) {
     if ball.translation.y < -540.0 {
         end_game_timer.lifetime.tick(time.delta());
 
         if end_game_timer.lifetime.finished() {
-            window.cursor_options.visible = true;
             window.cursor_options.grab_mode = CursorGrabMode::None;
+            commands
+                .entity(*window_entity)
+                .insert(CursorIcon::System(bevy::window::SystemCursorIcon::Default));
 
             next_gamestate.set(GameState::GameOver);
         }

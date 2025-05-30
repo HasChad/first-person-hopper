@@ -1,5 +1,9 @@
 use avian2d::prelude::*;
-use bevy::{prelude::*, window::CursorGrabMode};
+use bevy::{
+    prelude::*,
+    window::CursorGrabMode,
+    winit::cursor::{CursorIcon, CustomCursor, CustomCursorImage},
+};
 use bevy_kira_audio::prelude::*;
 use std::f32::consts::PI;
 
@@ -8,9 +12,6 @@ use crate::{GameDifficultyState, SCREEN_WIDTH};
 
 #[derive(Component)]
 pub struct InGameEntity;
-
-#[derive(Component)]
-pub struct CursorCrosshair;
 
 #[derive(Component)]
 pub struct Ball;
@@ -32,6 +33,7 @@ pub fn ingame_setup(
     game_difficulty_state: Res<State<GameDifficultyState>>,
     asset_server: Res<AssetServer>,
     mut window: Single<&mut Window>,
+    window_entity: Single<Entity, With<Window>>,
     mut scores: ResMut<Scores>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
@@ -41,7 +43,14 @@ pub fn ingame_setup(
 
     // lock and hide crosshair
     window.cursor_options.grab_mode = CursorGrabMode::Confined;
-    // window.cursor_options.visible = false;
+    commands
+        .entity(*window_entity)
+        .insert(CursorIcon::Custom(CustomCursor::Image(CustomCursorImage {
+            // Image to use as the cursor.
+            handle: asset_server.load("sprites/crosshair.png"),
+            hotspot: (5, 5),
+            ..default()
+        })));
 
     // end game timer creation
     commands.spawn((
@@ -77,13 +86,6 @@ pub fn ingame_setup(
             lifetime: Timer::from_seconds(0.2, TimerMode::Once),
             okay_to_shoot: true,
         },
-        InGameEntity,
-    ));
-
-    // crosshair
-    commands.spawn((
-        Sprite::from_image(asset_server.load("sprites/crosshair.png")),
-        CursorCrosshair,
         InGameEntity,
     ));
 

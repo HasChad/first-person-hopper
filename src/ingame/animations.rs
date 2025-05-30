@@ -2,7 +2,6 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 
-use crate::ingame::CursorCrosshair;
 use crate::ingame::Gun;
 use crate::ingame::HitEvent;
 
@@ -69,16 +68,24 @@ pub fn sprite_animator(time: Res<Time>, mut query: Query<(&mut AnimationConfig, 
 }
 
 pub fn contact_spawn(
+    window: Single<&Window>,
+    camera_query: Single<(&Camera, &GlobalTransform)>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut contact_event_reader: EventReader<HitEvent>,
-    cursor_pos: Single<&Transform, With<CursorCrosshair>>,
+
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     for _event in contact_event_reader.read() {
         let layout = TextureAtlasLayout::from_grid(UVec2::splat(48), 5, 1, None, None);
         let texture_atlas_layout = texture_atlas_layouts.add(layout);
         let animation_config = AnimationConfig::new(0, 4, 50, true);
+
+        let (camera, camera_transform) = *camera_query;
+        let cursor_position = window.cursor_position().unwrap();
+        let cursor_pos = camera
+            .viewport_to_world_2d(camera_transform, cursor_position)
+            .unwrap();
 
         commands.spawn((
             Sprite {
@@ -89,51 +96,14 @@ pub fn contact_spawn(
                 }),
                 ..default()
             },
-            Transform::from_xyz(cursor_pos.translation.x, cursor_pos.translation.y, -2.0),
+            Transform::from_xyz(cursor_pos.x, cursor_pos.y, -2.0),
             ContactSprite,
             animation_config,
         ));
     }
 }
 
-/*
-pub fn fire_spawn(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut textures: ResMut<Assets<TextureAtlas>>,
-    cursor_pos: Query<&Transform, With<CursorCrosshair>>,
-    gun_pos: Query<&Transform, With<GUN>>,
-    mut gun_event_reader: EventReader<GUNAnimationEvent>,
-) {
-    for _event in gun_event_reader.iter() {
-        commands
-            .spawn((SpriteSheetBundle {
-                texture_atlas: textures.add(TextureAtlas::from_grid(
-                    asset_server.load("sprites/fire_sheet.png"),
-                    Vec2::new(432.0, 80.0),
-                    1,
-                    3,
-                    None,
-                    None,
-                )),
-                transform: Transform::from_xyz(
-                    cursor_pos.single().translation.x + 150.0,
-                    cursor_pos.single().translation.y - 100.0,
-                    -1.0,
-                ),
-                sprite: TextureAtlasSprite {
-                    color: Color::rgb(5.0, 5.0, 0.0),
-                    ..default()
-                },
-                ..default()
-            },
-            InGameEntity,
-            ));
-    }
-}
-*/
-
-pub fn bullet_case_spawn(
+pub fn case_and_flash_spawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     gun_pos: Single<&Transform, With<Gun>>,

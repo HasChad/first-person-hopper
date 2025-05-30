@@ -30,13 +30,15 @@ bevy = { version = "0.16.0", default-features = false, features = [
     "multi_threaded",     # Enables multithreaded parallelism in the engine. Disabling it forces all engine tasks to run on a single thread.
     "png",                # PNG image format support
 
+    "custom_cursor", # Support custom cursors
+
     # Optional features
     "asset_processor", # Asset processing
     "serialize",       # Support for `serde` Serialize/Deserialize
     "dynamic_linking", # Dynamic linking for faster compile-times
 ] }
 bevy_kira_audio = "0.23.0"
-avian2d = { git = "https://github.com/Jondolf/avian", branch = "main" }
+avian2d = "0.3.0"
 rand = "0.9.1"
 
 [build-dependencies]

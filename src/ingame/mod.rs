@@ -41,7 +41,7 @@ impl Plugin for InGamePlugin {
                     // animation
                     sprite_animator,
                     contact_spawn,
-                    bullet_case_spawn,
+                    case_and_flash_spawn,
                     bullet_case_controller,
                     muzzle_flash_controller,
                     // ui
