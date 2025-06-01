@@ -52,10 +52,10 @@ pub fn ingame_setup(
             ..default()
         })));
 
-    // end game timer creation
+    // end game timer
     commands.spawn((
         EndGameTimer {
-            lifetime: Timer::from_seconds(0.5, TimerMode::Once),
+            lifetime: Timer::from_seconds(0.3, TimerMode::Once),
         },
         InGameEntity,
     ));

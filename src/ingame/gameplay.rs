@@ -4,7 +4,7 @@ use bevy_kira_audio::prelude::*;
 use rand::random_range;
 
 use super::{Ball, EndGameTimer, Gun, Scores, animations::AnimationConfig};
-use crate::{GameDifficultyState, GameState};
+use crate::{GameDifficultyState, GameState, SCREEN_HEIGHT};
 
 #[derive(Event)]
 pub struct ShootingEvent;
@@ -132,7 +132,7 @@ pub fn gameover_controller(
     audio: Res<Audio>,
     asset_server: Res<AssetServer>,
 ) {
-    if ball.translation.y < -540.0 {
+    if ball.translation.y < SCREEN_HEIGHT / -2.0 {
         if end_game_timer.lifetime.duration().as_secs_f32()
             == end_game_timer.lifetime.remaining_secs()
         {
