@@ -18,7 +18,10 @@ pub fn cursor_position(
     mut gun_pos: Single<&mut Transform, With<Gun>>,
 ) {
     let (camera, camera_transform) = *camera_query;
-    let cursor_position = window.cursor_position().unwrap();
+    let Some(cursor_position) = window.cursor_position() else {
+        return;
+    };
+
     let cursor_pos = camera
         .viewport_to_world_2d(camera_transform, cursor_position)
         .unwrap();
@@ -79,7 +82,9 @@ pub fn ball_contact_checker(
 ) {
     for _event in shooting_event_reader.read() {
         let (camera, camera_transform) = *camera_query;
-        let cursor_position = window.cursor_position().unwrap();
+        let Some(cursor_position) = window.cursor_position() else {
+            return;
+        };
         let cursor_pos = camera
             .viewport_to_world_2d(camera_transform, cursor_position)
             .unwrap();

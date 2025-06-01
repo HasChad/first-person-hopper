@@ -138,7 +138,7 @@ pub fn ingame_setup(
     match *game_difficulty_state.get() {
         GameDifficultyState::Easy => {
             commands.spawn((
-                Sprite::from_image(asset_server.load("sprites/easy_ball.png")),
+                Sprite::from_image(asset_server.load("sprites/ball_easy.png")),
                 Transform::from_xyz(0.0, 0.0, -6.0),
                 TransformInterpolation,
                 RigidBody::Dynamic,
@@ -160,7 +160,7 @@ pub fn ingame_setup(
         }
         GameDifficultyState::Normal => {
             commands.spawn((
-                Sprite::from_image(asset_server.load("sprites/normal_ball.png")),
+                Sprite::from_image(asset_server.load("sprites/ball_normal.png")),
                 Transform::from_xyz(0.0, 0.0, -6.0),
                 TransformInterpolation,
                 RigidBody::Dynamic,
@@ -182,7 +182,7 @@ pub fn ingame_setup(
         }
         GameDifficultyState::Hard => {
             commands.spawn((
-                Sprite::from_image(asset_server.load("sprites/hard_ball.png")),
+                Sprite::from_image(asset_server.load("sprites/ball_hard.png")),
                 Transform::from_xyz(0.0, 0.0, -6.0),
                 TransformInterpolation,
                 RigidBody::Dynamic,
