@@ -1,4 +1,4 @@
-// #![windows_subsystem = "windows"] //disable console on windows
+#![windows_subsystem = "windows"] //disable console on windows
 
 use avian2d::prelude::*;
 use bevy::{
@@ -101,7 +101,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     // version text
     commands.spawn((
-        Text::new("v2.0alpha_test"),
+        Text::new("v2.0"),
         TextFont {
             font: asset_server.load(CUSTOM_FONT),
             font_size: 15.0,
