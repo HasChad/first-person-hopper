@@ -8,7 +8,7 @@ use bevy_kira_audio::prelude::*;
 use std::f32::consts::PI;
 
 use super::{AnimationConfig, Scores};
-use crate::{GameDifficultyState, SCREEN_WIDTH};
+use crate::{GameDifficultyState, SCREEN_HEIGHT, SCREEN_WIDTH};
 
 #[derive(Component)]
 pub struct InGameEntity;
@@ -124,6 +124,13 @@ pub fn ingame_setup(
         RigidBody::Static,
         Collider::rectangle(200.0, 100000.0),
         Friction::new(0.0).with_combine_rule(CoefficientCombine::Min),
+        InGameEntity,
+    ));
+
+    // bottom border
+    commands.spawn((
+        Sprite::from_image(asset_server.load("sprites/bottom_border.png")),
+        Transform::from_xyz(0.0, SCREEN_HEIGHT / -2.0 - 50.0, -6.0),
         InGameEntity,
     ));
 

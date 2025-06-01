@@ -20,7 +20,7 @@ use ingame::InGamePlugin;
 use mainmenu::MainMenuPlugin;
 
 const SCREEN_WIDTH: f32 = 1920.0;
-// const SCREEN_HEIGHT: f32 = 1080.0;
+const SCREEN_HEIGHT: f32 = 1080.0;
 const CUSTOM_FONT: &str = "fonts/Gunplay.ttf";
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::srgb(0.25, 0.25, 0.25);

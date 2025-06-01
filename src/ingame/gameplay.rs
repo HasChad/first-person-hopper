@@ -129,8 +129,16 @@ pub fn gameover_controller(
     mut commands: Commands,
     window_entity: Single<Entity, With<Window>>,
     mut next_gamestate: ResMut<NextState<GameState>>,
+    audio: Res<Audio>,
+    asset_server: Res<AssetServer>,
 ) {
     if ball.translation.y < -540.0 {
+        if end_game_timer.lifetime.duration().as_secs_f32()
+            == end_game_timer.lifetime.remaining_secs()
+        {
+            audio.play(asset_server.load("sounds/casing.ogg"));
+        }
+
         end_game_timer.lifetime.tick(time.delta());
 
         if end_game_timer.lifetime.finished() {

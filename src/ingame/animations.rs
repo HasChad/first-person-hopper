@@ -10,6 +10,8 @@ use super::setup::InGameEntity;
 
 #[derive(Component)]
 pub struct BulletCase {
+    velocity: Vec2,
+    gravity: f32,
     lifetime: Timer,
 }
 
@@ -115,6 +117,8 @@ pub fn case_and_flash_spawn(
             Sprite::from_image(asset_server.load("sprites/bullet_case.png")),
             Transform::from_xyz(gun_pos.translation.x, gun_pos.translation.y + 200.0, -1.0),
             BulletCase {
+                velocity: Vec2::new(5000.0, 1000.0),
+                gravity: 10000.0,
                 lifetime: Timer::from_seconds(0.5, TimerMode::Once),
             },
         ));
@@ -139,12 +143,14 @@ pub fn bullet_case_controller(
     mut casing: Query<(Entity, &mut Transform, &mut BulletCase)>,
     time: Res<Time>,
 ) {
-    for (casing_entity, mut casing_transform, mut casing_timer) in &mut casing {
-        casing_timer.lifetime.tick(time.delta());
-        casing_transform.translation += Vec3::new(5000.0, 1000.0, 0.0) * time.delta_secs();
+    for (casing_entity, mut casing_transform, mut casing_prop) in &mut casing {
+        casing_prop.lifetime.tick(time.delta());
+        casing_transform.translation +=
+            Vec3::new(casing_prop.velocity.x, casing_prop.velocity.y, 0.0) * time.delta_secs();
         casing_transform.rotate_z(-30.0 * time.delta_secs());
+        casing_prop.velocity.y -= casing_prop.gravity * time.delta_secs();
 
-        if casing_timer.lifetime.finished() {
+        if casing_prop.lifetime.finished() {
             commands.entity(casing_entity).despawn();
         }
     }
