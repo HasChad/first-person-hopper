@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::CursorGrabMode, winit::cursor::CursorIcon};
 use bevy_kira_audio::prelude::*;
 use rand::random_range;
 
-use super::{Ball, EndGameTimer, Gun, Scores, animations::AnimationConfig};
+use super::{animations::AnimationConfig, Ball, EndGameTimer, Gun, Scores};
 use crate::{GameDifficultyState, GameState, SCREEN_HEIGHT};
 
 #[derive(Event)]
@@ -138,12 +138,6 @@ pub fn gameover_controller(
     asset_server: Res<AssetServer>,
 ) {
     if ball.translation.y < SCREEN_HEIGHT / -2.0 {
-        if end_game_timer.lifetime.duration().as_secs_f32()
-            == end_game_timer.lifetime.remaining_secs()
-        {
-            audio.play(asset_server.load("sounds/casing.ogg"));
-        }
-
         end_game_timer.lifetime.tick(time.delta());
 
         if end_game_timer.lifetime.finished() {
